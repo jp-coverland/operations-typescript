@@ -31,8 +31,7 @@ async function trackApiCall() {
   }
 }
 
-async function getOpenOrders(entriesPerPage = 100, pageNumber = 1, fulfilmentCenter: string) {
-  const AUTH_TOKEN = await getAuthToken();
+async function getOpenOrders(entriesPerPage: number, pageNumber: number, fulfilmentCenter: any, viewID: number, authorization: string) {
   try {
     await trackApiCall(); // Throttles requests based on count
 
@@ -45,7 +44,7 @@ async function getOpenOrders(entriesPerPage = 100, pageNumber = 1, fulfilmentCen
       },
       {
         headers: {
-          Authorization: `${AUTH_TOKEN}`,
+          Authorization: `${authorization}`,
           "Content-Type": "application/json",
         },
       }
@@ -65,13 +64,13 @@ async function getOpenOrders(entriesPerPage = 100, pageNumber = 1, fulfilmentCen
   }
 }
 
-async function fetchAllOpenOrders(entriesPerPage, warehouseId: string, maxPages = 10) {
+async function fetchAllOpenOrders(entriesPerPage: number, warehouseId: any, maxPages: number, authorization: string) {
   let allOrders = [];
   let pageNumber = 1;
 
   while (true) {
     console.log(`Fetching Open Orders - Page ${pageNumber}`);
-    const openOrders = await getOpenOrders(entriesPerPage, pageNumber, warehouseId, 1);
+    const openOrders = await getOpenOrders(entriesPerPage, pageNumber, warehouseId, 1, authorization);
     if (!openOrders.length) break; // Stop if no more orders
     allOrders.push(...openOrders);
     pageNumber++;
@@ -80,3 +79,83 @@ async function fetchAllOpenOrders(entriesPerPage, warehouseId: string, maxPages 
 
   return allOrders;
 }
+
+async function getOpenOrdersByID(fulfilmentCenter: any, authorization: string) {
+  try {
+    const response = await axios.post(
+      `${LINNWORKS_EXT_API_BASE}/Orders/GetAllOpenOrders`,
+      { FulfilmentCenter: fulfilmentCenter },
+      {
+        headers: {
+          Authorization: `${authorization}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      console.error("Error fetching open orders by ID:", error.response?.data || error.message);
+    } else {
+      console.error("Unknown error:", error);
+    }
+  }
+}
+
+async function getOrderDetailsByID(orderIDs: string[], authorization: string) {
+  // Need to batch by 200.
+  const batch_size = 200;
+  const batches = [];
+
+  for (let i = 0; i < orderIDs.length; i += batch_size) {
+    batches.push(orderIDs.slice(i, i + batch_size));
+  }
+
+  const results = [];
+
+  try {
+    await trackApiCall();
+
+    for (const batch of batches) {
+      const response = await axios.post(
+        `${LINNWORKS_EXT_API_BASE}/Orders/GetOrdersById`,
+        { pkOrderIds: batch },
+        {
+          headers: {
+            Authorization: `${authorization}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(`Fetching batch: ${response.data.length}`);
+
+      results.push(...response.data);
+    }
+
+    return results;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      console.error("Error fetching order details by ID:", error.response?.data || error.message);
+    } else {
+      console.error("Unknown error:", error);
+    }
+  }
+}
+
+async function main() {
+  const AUTH_TOKEN = await getAuthToken();
+  const ICARCOVER_WMS_WAREHOUSE_ID = process.env.ICARCOVER_WMS_WAREHOUSE_ID;
+
+  // Open orders, batching
+  // const openOrders = await fetchAllOpenOrders(50, process.env.ICARCOVER_WMS_WAREHOUSE_ID, 100, AUTH_TOKEN);
+  // console.log("Total Open Orders:", openOrders.length);
+
+  // Open order ID's
+  // Error fetching order details by ID: { Code: '-', Message: 'More than 200 ids not allowed' }
+  const openOrders = await getOpenOrdersByID(ICARCOVER_WMS_WAREHOUSE_ID, AUTH_TOKEN);
+  console.log(`Open orders: ${openOrders.length}`);
+  const orderDetails = await getOrderDetailsByID(openOrders, AUTH_TOKEN);
+}
+
+main();
