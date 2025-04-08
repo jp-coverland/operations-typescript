@@ -18,11 +18,13 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
+    "@google-cloud/local-auth": "^2.1.0",
     "@supabase/supabase-js": "^2.48.1",
     "axios": "^1.8.4",
     "csv-parser": "^3.2.0",
     "csv-stringify": "^6.5.2",
     "dotenv": "^16.4.7",
+    "googleapis": "^105.0.0",
     "luxon": "^3.5.0",
     "moment-timezone": "^0.5.47",
     "node-fetch": "^3.3.2",
