@@ -22,7 +22,7 @@ async function getPreorderInfo() {
   };
 
   const url = "https://api.skulabs.com/order/get_all";
-  const requestBody = 'request_body={"start":"2025-03-19T08:00:00","end":"2025-03-25T08:00:00","tags":["6691657a10b91213fbebbecb"]}';
+  const requestBody = 'request_body={"start":"2025-03-25T08:00:00","end":"2025-04-02T08:00:00","tags":["6691657a10b91213fbebbecb"]}';
   const apiUrl = `${url}?${requestBody}`;
 
   const responseGET = await fetch(apiUrl, options);

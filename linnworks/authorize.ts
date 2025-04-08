@@ -1,4 +1,4 @@
-import { authPayload } from "./constants";
+import { authPayload } from "../constants/constants";
 import dotenv from "dotenv";
 import axios from "axios";
 

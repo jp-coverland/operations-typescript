@@ -26,6 +26,8 @@
     "luxon": "^3.5.0",
     "moment-timezone": "^0.5.47",
     "node-fetch": "^3.3.2",
-    "papaparse": "^5.5.2"
+    "papaparse": "^5.5.2",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0"
   }
 }
