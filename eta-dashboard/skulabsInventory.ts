@@ -1,7 +1,8 @@
 import axios from "axios";
 import dotenv from "dotenv";
 import { getTimestamp, supabaseDataProcessing } from "../constants/constants";
-import { getLogger } from "../constants/loggers";
+// import { getLogger } from "../constants/loggers";
+import { logger } from "../constants/logger";
 import fs from "fs";
 import path from "path";
 
@@ -26,7 +27,7 @@ type SupabaseIDMapping = {
   item_id: string;
 };
 
-async function getSkuLabsItemsMap() {
+export async function getSkuLabsItemsMap() {
   const url = "https://api.skulabs.com/inventory/get_items_map";
   const reqeustBody = {
     data: {},
@@ -67,7 +68,8 @@ async function getSkuIDMapping() {
   const results: any[] = [];
   const delayBetweenRequests = 500;
 
-  console.info(`[${getTimestamp()}] Getting SKU-ID Mapping...`);
+  logger.info(`[START] Getting SKU-ID Mapping...\n[INFO] Valid item IDs: ${skuIDs.length}`);
+
   for (let i = 0; i < skuIDs.length; i += batchSize) {
     const batch = skuIDs.slice(i, i + batchSize);
 
@@ -78,14 +80,14 @@ async function getSkuIDMapping() {
 
       if (Array.isArray(batchData)) {
         results.push(...batchData);
-        console.info(`Successfully inserted batch ${i / batchSize}`);
+        logger.info(`Successfully inserted batch ${i / batchSize}`);
       } else {
-        console.warn(`Unexpected response at batch ${i / batchSize}:`, batchData);
+        logger.info(`Unexpected response at batch ${i / batchSize}:`, batchData);
       }
     } catch (error: any) {
       const status = error.response?.status;
       const apiMessage = error.response?.data?.message || JSON.stringify(error.response?.data);
-      console.error(`Failed batch ${i / batchSize} (Status ${status}): ${apiMessage}`);
+      logger.error(`[ERROR] Failed batch ${i / batchSize} (Status ${status}): ${apiMessage}`);
     }
   }
 
@@ -93,10 +95,13 @@ async function getSkuIDMapping() {
   const outputPathReuse = path.resolve(__dirname, `most-recent-sku-id-map.json`);
   fs.writeFileSync(outputPath, JSON.stringify(results, null, 2), "utf-8");
   fs.writeFileSync(outputPathReuse, JSON.stringify(results, null, 2), "utf-8");
+
+  logger.info(`[END] Finished SKU-ID Mapping and exporting json files.`);
   //   return inventoryBySkuName;
 }
 
-function getInventoryBySkuName(skuLabsItemsMap: any) {
+export function getInventoryBySkuName(skuLabsItemsMap: any) {
+  // const logger = getLogger(__dirname, "inventory-by-sku-name");
   const filePath = path.resolve(__dirname, `most-recent-sku-id-map.json`);
   const rawData = fs.readFileSync(filePath, "utf-8");
   const skuIdMapping = JSON.parse(rawData);
@@ -111,8 +116,10 @@ function getInventoryBySkuName(skuLabsItemsMap: any) {
     const sku = itemIDToSkuMap[itemID];
     if (sku) {
       inventoryBySkuName[sku] = skuLabsItemsMap[itemID];
+    } else if (itemID === "sku_reserve_breakdown_by_order") {
+      continue;
     } else {
-      console.error(`No SKU found for itemID: ${itemID}`);
+      logger.error(`[ERROR] No SKU found for itemID: ${itemID} at ${getTimestamp()}`);
     }
   }
 
@@ -162,17 +169,6 @@ async function updateInventoryOnSupabase(inventoryBySkuName: InventoryBySkuName)
   return updates;
 }
 
-async function main() {
-  try {
-    // getSkuIDMapping();
-    const itemsMap = await getSkuLabsItemsMap();
-    const inventoryBySkuName = getInventoryBySkuName(itemsMap);
-    const updates = await updateInventoryOnSupabase(inventoryBySkuName);
-    console.log(updates);
-  } catch (error) {
-    console.error("Error:", error);
-    // log.error("Error on getting inventory data:", { error });
-  }
+function main() {
+  getSkuIDMapping();
 }
-
-main();
