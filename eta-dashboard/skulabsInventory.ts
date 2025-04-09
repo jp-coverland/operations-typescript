@@ -1,7 +1,6 @@
 import axios from "axios";
 import dotenv from "dotenv";
 import { getTimestamp, supabaseDataProcessing } from "../constants/constants";
-// import { getLogger } from "../constants/loggers";
 import { logger } from "../constants/logger";
 import fs from "fs";
 import path from "path";
@@ -119,7 +118,7 @@ export function getInventoryBySkuName(skuLabsItemsMap: any) {
     } else if (itemID === "sku_reserve_breakdown_by_order") {
       continue;
     } else {
-      logger.error(`[ERROR] No SKU found for itemID: ${itemID} at ${getTimestamp()}`);
+      logger.error(`[ERROR] No SKU found for itemID: ${itemID}`);
     }
   }
 
@@ -165,10 +164,12 @@ async function updateInventoryOnSupabase(inventoryBySkuName: InventoryBySkuName)
   }
 
   console.info(`Successful updates: ${updates.length}\nFailed updates b/c not found: ${notFound.length}`);
-
-  return updates;
 }
 
-function main() {
-  getSkuIDMapping();
+async function main() {
+  const skuLabsItemsMap = await getSkuLabsItemsMap();
+  const inventoryBySkuName = await getInventoryBySkuName(skuLabsItemsMap);
+  updateInventoryOnSupabase(inventoryBySkuName);
 }
+
+main();
