@@ -59,15 +59,15 @@ async function updatePackingListToSupabase(csvData: PackingList[]) {
 
   logger.info(`[info] map data:\n${JSON.stringify(updates, null, 2)}`);
 
-  //   const { error: updateError } = await supabaseDataProcessing.rpc("update_received_quantities", {
-  //     updates,
-  //   });
+  const { error: updateError } = await supabaseDataProcessing.rpc("update_received_quantities", {
+    updates,
+  });
 
-  //   if (updateError) {
-  //     logger.error("Failed to update Supabase data:", updateError);
-  //   } else {
-  //     logger.info(`[end] Finished updating received quantities to Supabase.`);
-  //   }
+  if (updateError) {
+    logger.error("Failed to update Supabase data:", updateError);
+  } else {
+    logger.info(`[end] Finished updating received quantities to Supabase.`);
+  }
 }
 
 async function main() {

@@ -1,4 +1,4 @@
-import { supabase } from "../missing-order-check/supabaseClients";
+import { supabase } from "../constants/constants";
 
 export async function getOrderInfo(orderNumber: string) {
   if (!orderNumber) {
