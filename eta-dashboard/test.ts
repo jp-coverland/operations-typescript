@@ -1,25 +1,10 @@
-import axios from "axios";
+import fs from "fs";
+import path from "path";
 
-async function getItems() {
-  const url = "https://api.skulabs.com/inventory/get_items";
-  const reqeustBody = {
-    item_ids: ["65ea058dc232eeedf72687ac"],
-    warehouse_ids: ["62f0fcc0fc3f4e916f865d70"],
-  };
+const jsonData = JSON.parse(fs.readFileSync("eta-dashboard/most-recent-sku-id-map.json", "utf-8"));
 
-  const response = await axios.post(url, reqeustBody, {
-    headers: {
-      Authorization: `Bearer ${process.env.SKU_LABS_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-  });
+const headers = ["id", "sku"];
+const rows = jsonData.map((item: any) => [item._id, item.sku].join(","));
+const csv = [headers.join(","), ...rows].join("\n");
 
-  return response.data;
-}
-
-async function main() {
-  const data = await getItems();
-  console.log(data);
-}
-
-main();
+fs.writeFileSync(path.resolve(__dirname, "output.csv"), csv, "utf-8");

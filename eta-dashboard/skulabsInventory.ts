@@ -67,7 +67,7 @@ async function getSkuIDMapping() {
   const results: any[] = [];
   const delayBetweenRequests = 500;
 
-  logger.info(`[START] Getting SKU-ID Mapping...\n[INFO] Valid item IDs: ${skuIDs.length}`);
+  logger.info(`[start] Getting SKU-ID Mapping...\n[INFO] Valid item IDs: ${skuIDs.length}`);
 
   for (let i = 0; i < skuIDs.length; i += batchSize) {
     const batch = skuIDs.slice(i, i + batchSize);
@@ -86,7 +86,7 @@ async function getSkuIDMapping() {
     } catch (error: any) {
       const status = error.response?.status;
       const apiMessage = error.response?.data?.message || JSON.stringify(error.response?.data);
-      logger.error(`[ERROR] Failed batch ${i / batchSize} (Status ${status}): ${apiMessage}`);
+      logger.error(`[error] Failed batch ${i / batchSize} (Status ${status}): ${apiMessage}`);
     }
   }
 
@@ -95,7 +95,7 @@ async function getSkuIDMapping() {
   fs.writeFileSync(outputPath, JSON.stringify(results, null, 2), "utf-8");
   fs.writeFileSync(outputPathReuse, JSON.stringify(results, null, 2), "utf-8");
 
-  logger.info(`[END] Finished SKU-ID Mapping and exporting json files.`);
+  logger.info(`[end] Finished SKU-ID Mapping and exporting json files.`);
   //   return inventoryBySkuName;
 }
 
@@ -118,7 +118,7 @@ export function getInventoryBySkuName(skuLabsItemsMap: any) {
     } else if (itemID === "sku_reserve_breakdown_by_order") {
       continue;
     } else {
-      logger.error(`[ERROR] No SKU found for itemID: ${itemID}`);
+      logger.error(`[error] No SKU found for itemID: ${itemID}`);
     }
   }
 
@@ -172,4 +172,4 @@ async function main() {
   updateInventoryOnSupabase(inventoryBySkuName);
 }
 
-main();
+// main();
