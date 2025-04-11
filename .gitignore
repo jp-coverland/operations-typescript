@@ -1,4 +1,37 @@
+node_modules/
 .env
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# TypeScript output
+dist/
+build/
+*.tsbuildinfo
+
 *.csv
 *.json
 *.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE configs
+.vscode/
+.idea/
+
+# PM2 process logs (if used)
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Optional: Remove if you use these tools
+*.swp
+*.swo
