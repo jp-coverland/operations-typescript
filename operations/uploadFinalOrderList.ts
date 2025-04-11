@@ -77,7 +77,14 @@ async function updateToSupabase(csvData: any) {
       throw error;
     }
 
-    logger.info("[success] Final Order List uploaded successfully.");
+    if (data && data.length > 0) {
+      logger.warn(`[warn] Some rows failed to insert:`);
+      for (const item of data) {
+        logger.warn(`  → Container: ${item.container}, SKU: ${item.sku}, Reason: ${item.reason}`);
+      }
+    } else {
+      logger.info(`[success] All rows uploaded successfully.`);
+    }
   } catch (error) {
     logger.error("[exception] Upload process crashed:", error);
   }
@@ -87,7 +94,8 @@ async function main() {
   const csvFilePath = path.resolve(__dirname, "final_order_list.csv");
   const csv: any = readFinalOrderListCSV(csvFilePath);
 
-  await updateToSupabase(csv);
+  const failedData = await updateToSupabase(csv);
+  console.log(failedData);
 }
 
 main();
