@@ -30,16 +30,16 @@ async function getLinnworksInventory(entriesPerPage: number, pageNumber: number,
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      console.error("Error fetching open orders:", error.response?.data || error.message);
+      logger.error("Error fetching open orders:", error.response?.data || error.message);
     } else {
-      console.error("Unknown error:", error);
+      logger.error("Unknown error:", error);
     }
 
     throw error;
   }
 }
 
-async function getLinnworksInventoryTotal() {
+export async function getLinnworksInventoryComplete() {
   const entriesPerPage = 400;
   const pageNumber = 1;
   const ICARCOVER_WMS_WAREHOUSE_ID = process.env.ICARCOVER_WMS_WAREHOUSE_ID;
@@ -60,14 +60,5 @@ async function getLinnworksInventoryTotal() {
     totalData = totalData.concat(result.Data);
   }
 
-  logger.info(`[end] Finished pagination.\nReturned data:\n${JSON.stringify(totalData, null, 2)}`);
   return totalData;
 }
-
-async function main() {
-  const linnworksInventory = await getLinnworksInventoryTotal();
-
-  console.log(linnworksInventory);
-}
-
-// main();

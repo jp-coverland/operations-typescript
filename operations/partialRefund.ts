@@ -90,5 +90,3 @@ async function main() {
   const individualSKUs = await getFrontBackPrice(orderData);
   console.log(individualSKUs);
 }
-
-main();

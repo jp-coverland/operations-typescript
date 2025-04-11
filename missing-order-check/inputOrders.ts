@@ -58,5 +58,3 @@ async function main() {
     console.error("Error processing CSV:", error);
   }
 }
-
-main();

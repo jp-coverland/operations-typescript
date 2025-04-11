@@ -117,20 +117,3 @@ async function getOrderDetailsByID(orderIDs: string[], authorization: string): P
     }
   }
 }
-
-async function main() {
-  const AUTH_TOKEN = await getAuthToken();
-  const ICARCOVER_WMS_WAREHOUSE_ID = process.env.ICARCOVER_WMS_WAREHOUSE_ID;
-
-  // Open orders, batching
-  // const openOrders = await fetchAllOpenOrders(50, process.env.ICARCOVER_WMS_WAREHOUSE_ID, 100, AUTH_TOKEN);
-  // console.log("Total Open Orders:", openOrders.length);
-
-  // Open orders by ID
-  const openOrders = await getOpenOrdersByID(ICARCOVER_WMS_WAREHOUSE_ID, AUTH_TOKEN);
-  console.log(`Open orders: ${openOrders.length}`);
-  const orderDetails = await getOrderDetailsByID(openOrders, AUTH_TOKEN);
-  console.log(`Returned orders: ${orderDetails.length}`);
-}
-
-main();

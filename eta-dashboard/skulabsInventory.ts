@@ -125,11 +125,3 @@ async function updateInventoryOnSupabase(inventoryBySkuName: InventoryBySkuName)
 
   console.info(`Successful updates: ${updates.length}\nFailed updates b/c not found: ${notFound.length}`);
 }
-
-async function main() {
-  const skuLabsItemsMap = await getSkuLabsItemsMap();
-  const inventoryBySkuName = await getInventoryBySkuName(skuLabsItemsMap);
-  updateInventoryOnSupabase(inventoryBySkuName);
-}
-
-// main();

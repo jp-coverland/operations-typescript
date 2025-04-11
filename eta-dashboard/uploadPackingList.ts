@@ -64,12 +64,3 @@ async function updatePackingListToSupabase(csvData: PackingList[]) {
     logger.info(`[end] Finished updating received quantities to Supabase.`);
   }
 }
-
-async function main() {
-  const csvFilePath = path.resolve(__dirname, "packing_list.csv");
-  const csv: any = await readPackingListCSV(csvFilePath);
-
-  await updatePackingListToSupabase(csv);
-}
-
-main();

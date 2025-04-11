@@ -22,10 +22,3 @@ export async function getSupabaseQuery() {
 }
 
 export async function readCSV() {}
-
-export async function main() {
-  const { data } = await getSupabaseQuery();
-  console.log(data);
-}
-
-main();
