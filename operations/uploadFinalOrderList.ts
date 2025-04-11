@@ -94,8 +94,7 @@ async function main() {
   const csvFilePath = path.resolve(__dirname, "final_order_list.csv");
   const csv: any = readFinalOrderListCSV(csvFilePath);
 
-  const failedData = await updateToSupabase(csv);
-  console.log(failedData);
+  await updateToSupabase(csv);
 }
 
 main();

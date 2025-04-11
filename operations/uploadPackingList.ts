@@ -24,7 +24,6 @@ async function readPackingListCSV(csvFilePath: string) {
     return;
   }
 
-  logger.info(`[info] Returned CSV:\n${JSON.stringify(parsed.data, null, 2)}`);
   return parsed.data;
 }
 
@@ -38,8 +37,6 @@ async function updatePackingListToSupabase(csvData: PackingList[]) {
     return;
   }
 
-  logger.info(`Retrieved rows from Supabase:\n${JSON.stringify(folData, null, 2)}`);
-
   const updates: { id: number; received_quantity: number }[] = [];
 
   for (const csvRow of csvData) {
@@ -47,7 +44,7 @@ async function updatePackingListToSupabase(csvData: PackingList[]) {
       const matchedRow = folData.find((rpcRow: any) => rpcRow.container_name === csvRow.pi_number && rpcRow.master_sku === csvRow.sku);
 
       if (!matchedRow) {
-        logger.warn(`No match found for pi_number: ${csvRow.pi_number}, sku: ${csvRow.sku}`);
+        logger.error(`No match found for pi_number: ${csvRow.pi_number}, sku: ${csvRow.sku}`);
         continue;
       }
 
@@ -56,8 +53,6 @@ async function updatePackingListToSupabase(csvData: PackingList[]) {
       logger.error(`Error during iteration of csv rows:`, error);
     }
   }
-
-  logger.info(`[info] map data:\n${JSON.stringify(updates, null, 2)}`);
 
   const { error: updateError } = await supabaseDataProcessing.rpc("update_received_quantities", {
     updates,
@@ -74,7 +69,7 @@ async function main() {
   const csvFilePath = path.resolve(__dirname, "packing_list.csv");
   const csv: any = await readPackingListCSV(csvFilePath);
 
-  updatePackingListToSupabase(csv);
+  await updatePackingListToSupabase(csv);
 }
 
 main();
