@@ -20,12 +20,15 @@ function getLogFileName(prefix: string) {
 }
 
 const commonFormat = winston.format.printf(({ timestamp, level, message, ...meta }) => {
-  let output = `${timestamp} [${level}]: ${message}`;
+  const context = meta.context;
+  delete meta.context;
+
+  let output = `${timestamp} [${level}]${context ? ` [${context}]` : ""}: ${message}`;
 
   // Check if there are metadata properties besides internal Winston properties
   const metaWithoutInternals = { ...meta };
-  delete metaWithoutInternals.metadata;
-  delete metaWithoutInternals.service;
+  delete meta.metadata;
+  delete meta.service;
 
   // Get actual data from metadata (could be in meta.metadata or directly in meta)
   const data = meta.metadata || metaWithoutInternals;

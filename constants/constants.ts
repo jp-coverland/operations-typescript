@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 import { createClient } from "@supabase/supabase-js";
-import { DateTime } from "luxon";
 
 dotenv.config();
 const NEXT_PUBLIC_SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -30,5 +29,12 @@ export const authPayload = {
 export const LINNWORKS_EXT_API_BASE = "https://us-ext.linnworks.net/api";
 
 export function getTimestamp() {
-  return DateTime.now().setZone("America/Los_Angeles").toFormat("yyyy-LL-dd_HHmmss");
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const now = new Date();
+
+  const date = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  const time = `${pad(now.getHours())}${pad(now.getMinutes())}`;
+  const timestamp = `${date}_${time}`;
+
+  return timestamp;
 }
