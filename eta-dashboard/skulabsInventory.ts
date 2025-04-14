@@ -4,10 +4,12 @@ import { supabaseDataProcessing } from "../constants/constants";
 import { logger } from "../constants/logger";
 import fs from "fs";
 import path from "path";
+import { unparse } from "papaparse";
 
 dotenv.config();
 
 type InventoryCounts = {
+  item_id: string;
   on_hand: number;
   reserved: number;
   free: number;
@@ -74,7 +76,7 @@ export function getInventoryBySkuName(skuLabsItemsMap: any) {
   for (const itemID in skuLabsItemsMap) {
     const sku = itemIDToSkuMap[itemID];
     if (sku) {
-      inventoryBySkuName[sku] = skuLabsItemsMap[itemID];
+      inventoryBySkuName[sku] = { item_id: itemID, ...skuLabsItemsMap[itemID] };
     } else if (itemID === "sku_reserve_breakdown_by_order") {
       continue;
     } else {
@@ -86,7 +88,7 @@ export function getInventoryBySkuName(skuLabsItemsMap: any) {
 }
 
 async function getSupabaseInventory() {
-  const { data, error } = await supabaseDataProcessing.from("skus_skulabs").select("id, master_sku");
+  const { data, error } = await supabaseDataProcessing.from("skus_skulabs").select("*");
 
   if (error) {
     throw new Error(`Supabase query failed: ${JSON.stringify(error, null, 2)}`);
@@ -95,33 +97,62 @@ async function getSupabaseInventory() {
   return { data: data, error: null };
 }
 
-async function updateInventoryOnSupabase(inventoryBySkuName: InventoryBySkuName) {
+export async function updateInventoryOnSupabase(inventoryBySkuName: InventoryBySkuName) {
   const supabaseSKUs = await getSupabaseInventory();
-
-  const updates = [];
-  const notFound = [];
+  const supabaseMap: Record<string, any> = [];
 
   for (const row of supabaseSKUs.data) {
-    const inventoryData = inventoryBySkuName[row.master_sku];
+    supabaseMap[row.master_sku] = row;
+  }
 
-    if (inventoryData) {
-      updates.push({
-        id: row.id,
-        master_sku: row.master_sku,
-        on_hand: inventoryData.on_hand,
-        reserved: inventoryData.reserved,
-        free: inventoryData.free,
-      });
+  const updates = [];
+  const inserts = [];
+  const skipped = [];
+
+  for (const [sku, inv] of Object.entries(inventoryBySkuName)) {
+    const existing = supabaseMap[sku];
+
+    if (existing) {
+      const needsUpdate = existing.on_hand !== inv.on_hand || existing.reserved !== inv.reserved || existing.free !== inv.free;
+
+      if (needsUpdate) {
+        updates.push({ id: existing.id, on_hand: inv.on_hand, reserved: inv.reserved, free: inv.free, updated_at: new Date().toISOString() });
+      }
     } else {
-      // row in skus_skulabs table is not found in inventoryBySkuName
-      notFound.push({
-        id: row.id,
-        master_sku: row.master_sku,
+      let product_type = "unknown";
+
+      if (/^CA-SC-10-F-/.test(sku)) {
+        product_type = "front seat cover";
+      } else if (/^CA-SC-10-B-/.test(sku)) {
+        product_type = "rear seat cover";
+      } else if (/^CA-SC-10-E-/.test(sku)) {
+        product_type = "third row seat cover";
+      } else if (/^CA-FM-TX/.test(sku)) {
+        product_type = "floor mats";
+      } else if (/^CC-/.test(sku)) {
+        product_type = "car cover";
+      } else {
+        skipped.push({ master_sku: sku });
+        continue;
+      }
+
+      inserts.push({
+        master_sku: sku,
+        item_id: inv.item_id,
+        product_type,
+        on_hand: inv.on_hand,
+        reserved: inv.reserved,
+        free: inv.free,
+        updated_at: new Date().toISOString(),
       });
-      // error should only display sku name, if displays sku ID, something is wrong.
-      console.error(`Not found: ${(row.id, row.master_sku)}`);
     }
   }
 
-  console.info(`Successful updates: ${updates.length}\nFailed updates b/c not found: ${notFound.length}`);
+  const insertsCSV = unparse(inserts);
+  const skippedCSV = unparse(skipped);
+  fs.writeFileSync(path.resolve(__dirname, "not_on_supabase.csv"), insertsCSV, "utf-8");
+  fs.writeFileSync(path.resolve(__dirname, "skipped.csv"), skippedCSV, "utf-8");
+
+  await supabaseDataProcessing.rpc("batch_update_skulabs_inventory", { payload: updates });
+  logger.info(`Updated ${updates.length} rows.`);
 }

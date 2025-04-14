@@ -10,7 +10,7 @@ interface FinalOrderItem {
   quantity: number;
 }
 
-function readFinalOrderListCSV(csvFilePath: string) {
+export function readFinalOrderListCSV(csvFilePath: string) {
   logger.info(`[start] Reading Final Order List CSV...`);
   const finalOrderListData: FinalOrderItem[] = [];
 
@@ -44,7 +44,7 @@ function readFinalOrderListCSV(csvFilePath: string) {
   return finalOrderListData;
 }
 
-async function updateToSupabase(csvData: any) {
+export async function updateToSupabase(csvData: any) {
   logger.info(`[start] update final order list to Supabase...`);
 
   try {
