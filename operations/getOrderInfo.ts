@@ -112,5 +112,3 @@ async function getOrderInfo() {
     console.error("Error exporting to JSON:", error);
   }
 }
-
-getOrderInfo();

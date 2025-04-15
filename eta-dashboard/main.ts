@@ -1,3 +1,5 @@
+import moment from "moment";
+import { fetchOrderInfo, getSkuCountFromOrders } from "./sales";
 import { getInventoryBySkuName, getSkuLabsItemsMap, updateInventoryOnSupabase } from "./skulabsInventory";
 import { readFinalOrderListCSV, updateToSupabase } from "./uploadFinalOrderList";
 import path from "path";
@@ -19,3 +21,14 @@ async function supabaseSkuInventory() {
 }
 
 // supabaseSkuInventory();
+
+async function getSales() {
+  const orderInfo = await fetchOrderInfo();
+  const data: any = getSkuCountFromOrders(orderInfo.preorderData, orderInfo.startDate28);
+  const sorted = data.sort((a: any, b: any) => moment(a.date).valueOf() - moment(b.date).valueOf());
+
+  console.log(sorted.length);
+  // console.log(JSON.stringify(sorted, null));
+}
+
+// getSales();

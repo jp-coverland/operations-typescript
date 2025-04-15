@@ -4,7 +4,6 @@ import { supabaseDataProcessing } from "../constants/constants";
 import { logger } from "../constants/logger";
 import fs from "fs";
 import path from "path";
-import { unparse } from "papaparse";
 
 dotenv.config();
 
@@ -98,6 +97,7 @@ async function getSupabaseInventory() {
 }
 
 export async function updateInventoryOnSupabase(inventoryBySkuName: InventoryBySkuName) {
+  logger.info(`[start] starting uploading inventory count on to Supabase...`);
   const supabaseSKUs = await getSupabaseInventory();
   const supabaseMap: Record<string, any> = [];
 
@@ -147,11 +147,6 @@ export async function updateInventoryOnSupabase(inventoryBySkuName: InventoryByS
       });
     }
   }
-
-  const insertsCSV = unparse(inserts);
-  const skippedCSV = unparse(skipped);
-  fs.writeFileSync(path.resolve(__dirname, "not_on_supabase.csv"), insertsCSV, "utf-8");
-  fs.writeFileSync(path.resolve(__dirname, "skipped.csv"), skippedCSV, "utf-8");
 
   await supabaseDataProcessing.rpc("batch_update_skulabs_inventory", { payload: updates });
   logger.info(`Updated ${updates.length} rows.`);
