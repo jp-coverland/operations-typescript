@@ -1,6 +1,6 @@
 import moment from "moment";
 import { fetchOrderInfo, getSkuCountFromOrders } from "./sales";
-import { getInventoryBySkuName, getSkuLabsItemsMap, updateInventoryOnSupabase } from "./skulabsInventory";
+import { getInventoryBySkuName, getSkuLabsItemsMap, updateInventoryOnSupabase, updateSupabaseInventoryDraft } from "./skulabsInventory";
 import { readFinalOrderListCSV, updateToSupabase } from "./uploadFinalOrderList";
 import path from "path";
 
@@ -32,3 +32,12 @@ async function getSales() {
 }
 
 // getSales();
+
+async function updateInventoryDraft() {
+  const itemsMap = await getSkuLabsItemsMap();
+  const inventoryBySkuName = await getInventoryBySkuName(itemsMap);
+
+  await updateSupabaseInventoryDraft(inventoryBySkuName);
+}
+
+// updateInventoryDraft();

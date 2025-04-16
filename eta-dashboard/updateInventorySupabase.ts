@@ -1,4 +1,4 @@
-import { getInventoryBySkuName, getSkuLabsItemsMap, updateInventoryOnSupabase } from "./skulabsInventory";
+import { getInventoryBySkuName, getSkuLabsItemsMap, updateInventoryOnSupabase, updateSupabaseInventoryDraft } from "./skulabsInventory";
 
 async function updateInventory() {
   const itemsMap = await getSkuLabsItemsMap();
