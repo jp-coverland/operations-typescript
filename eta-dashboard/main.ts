@@ -3,6 +3,7 @@ import { fetchOrderInfo, getSkuCountFromOrders } from "./sales";
 import { getInventoryBySkuName, getSkuLabsItemsMap, updateInventoryOnSupabase, updateSupabaseInventoryDraft } from "./skulabsInventory";
 import { readFinalOrderListCSV, updateToSupabase } from "./uploadFinalOrderList";
 import path from "path";
+import { compareCSVs } from "./compareDbCsv";
 
 async function finalOrderList() {
   const csvFilePath = path.resolve(__dirname, "final_order_list.csv");
@@ -41,3 +42,5 @@ async function updateInventoryDraft() {
 }
 
 // updateInventoryDraft();
+
+// compareCSVs();

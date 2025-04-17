@@ -204,6 +204,19 @@ export async function updateSupabaseInventoryDraft(inventoryBySkuName: Inventory
     }
   }
 
-  await supabaseDataProcessing.rpc("batch_update_skulabs_inventory_eta", { payload: updates });
-  logger.info(`Updated ${updates.length} rows.`);
+  if (updates.length > 0) {
+    await supabaseDataProcessing.rpc("batch_update_skulabs_inventory_eta", { payload: updates });
+    logger.info(`Updated ${updates.length} rows.`);
+  }
+
+  if (inserts.length > 0) {
+    const { error: insertError } = await supabaseDataProcessing.from("skus_skulabs_test_eta").upsert(inserts, { onConflict: "master_sku" });
+
+    if (insertError) throw new Error(`Insert upsert failed: ${insertError.message}`);
+    logger.info(`Inserted ${inserts.length} rows.`);
+  }
+
+  if (skipped.length > 0) {
+    logger.warn(`Skipped ${skipped.length} SKUs due to unmatched patterns.`);
+  }
 }

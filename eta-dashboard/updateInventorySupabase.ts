@@ -6,5 +6,3 @@ async function updateInventory() {
 
   await updateInventoryOnSupabase(inventoryBySkuName);
 }
-
-updateInventory();
