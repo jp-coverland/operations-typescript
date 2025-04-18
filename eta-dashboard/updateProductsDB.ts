@@ -2,9 +2,10 @@ import { supabase, supabaseDataProcessing } from "../constants/constants";
 import fs from "fs";
 import Papa from "papaparse";
 import path = require("path");
+import { logger } from "../constants/logger";
 
 async function getSkus() {
-  const { data, error } = await supabaseDataProcessing.from("skus_skulabs_test_eta").select("*");
+  const { data, error } = await supabaseDataProcessing.from("skus_skulabs").select("*");
 
   if (error) {
     throw new Error(`Supabase query failed: ${JSON.stringify(error, null, 2)}`);
@@ -87,17 +88,21 @@ function evaluatePreorderValues(matchedParts: Array<{ preorder: boolean; next_co
   };
 }
 
-async function updateProductsDB() {
-  console.log("Starting updating products table...");
+export async function updateProductsDB() {
+  logger.info("Starting updating products table...");
   const BATCH_SIZE = 10000;
   let offset = 0;
   let hasMore = true;
 
   const { data: skus } = await getSkus();
   const allBatches = [];
-  const notFound: any[] = [];
+  const allNotFound: any[] = [];
 
   while (hasMore) {
+    const updates = [];
+    const skipped = [];
+    const notFound = [];
+
     const { data: products, error } = await supabase
       .from("products_duplicate_ji")
       .select(`id, type, display_set, "skulabs SKU", preorder, preorder_discount, preorder_date`)
@@ -112,50 +117,70 @@ async function updateProductsDB() {
       hasMore = false;
       break;
     }
+    logger.info(`Getting data from ${offset} to ${offset + BATCH_SIZE - 1}`);
 
-    console.log(`Getting data from ${offset} to ${offset + BATCH_SIZE - 1}`);
-    const batchArray = products
-      .map((product) => {
-        const skuKey = product["skulabs SKU"];
-        const displaySet = product["display_set"];
-        const type = product["type"];
+    for (const product of products) {
+      const skuKey = product["skulabs SKU"];
+      const displaySet = product["display_set"];
+      const type = product["type"];
 
-        if (type === "Floor Mats") return null;
+      if (type === "Floor Mats") continue;
 
-        let matches: Array<{ preorder: boolean; next_container_date: string }> = [];
+      let matches: Array<{ preorder: boolean; next_container_date: string }> = [];
 
-        if (displaySet === "Full Seat Set") {
-          const parts = getIndividualFromFullSet(skuKey);
-          matches = parts.map((part) => skus[part]).filter((match) => match); // filter out undefined
-        } else {
-          const match = skus[skuKey];
-          if (match) matches.push(match);
-        }
+      if (displaySet === "Full Seat Set") {
+        const parts = getIndividualFromFullSet(skuKey);
+        matches = parts.map((part) => skus[part]).filter((match) => match);
+      } else {
+        const match = skus[skuKey];
+        if (match) matches.push(match);
+      }
 
-        if (matches.length === 0) {
-          notFound.push(product);
-        }
+      if (matches.length === 0) {
+        notFound.push(product);
+        continue;
+      }
 
-        const { preorder, preorder_date, preorder_discount } = evaluatePreorderValues(matches, type, displaySet);
+      const { preorder, preorder_date, preorder_discount } = evaluatePreorderValues(matches, type, displaySet);
+      const shouldUpdate = preorder !== product.preorder || preorder_discount !== product.preorder_discount || preorder_date !== product.preorder_date;
+      const row = {
+        id: product.id,
+        sku: skuKey,
+        preorder,
+        preorder_date: preorder_date,
+        preorder_discount,
+      };
 
-        return {
-          id: product.id,
-          sku: skuKey,
-          preorder,
-          next_container_date: preorder_date,
-          preorder_discount,
-        };
-      })
-      .filter(Boolean); // removes nulls
+      if (shouldUpdate) {
+        updates.push(row);
+      } else {
+        skipped.push(row);
+      }
+    }
+
+    // upsert incrementally
+    const { error: updateError } = await supabase.from("products_duplicate_ji").upsert(updates, { onConflict: "id" });
+
+    if (updateError) {
+      logger.error(`update error for rows ${offset} to ${offset + BATCH_SIZE - 1}`, updateError);
+    } else {
+      logger.info(
+        `updated ${updates.length} rows, skipped ${skipped.length} rows, and not found ${notFound.length} rows on products table for batch ${offset} to ${
+          offset + BATCH_SIZE - 1
+        }`
+      );
+    }
+
+    const taggedUpdates = updates.map((row) => ({ ...row, source: "updated" }));
+    const taggedSkipped = skipped.map((row) => ({ ...row, source: "skipped" }));
+    allBatches.push(...taggedUpdates, ...taggedSkipped);
+    allNotFound.push(notFound);
 
     offset += BATCH_SIZE;
-    allBatches.push(...batchArray);
   }
-
-  // NEED TO: write logic to actually push changes to the database
 
   const csv = Papa.unparse(allBatches);
   fs.writeFileSync(path.resolve(__dirname, "product_db_eta.csv"), csv, "utf-8");
-  console.log("CSV written to output.csv");
-  console.log("Not on skulabs:", notFound);
+
+  logger.warn("Not on skulabs:", allNotFound);
 }

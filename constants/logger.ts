@@ -2,7 +2,7 @@ import winston from "winston";
 import path from "path";
 import fs from "fs";
 
-function getLogFileName(prefix: string) {
+function getLogFileName(prefix: string, context?: string) {
   const pad = (n: number) => String(n).padStart(2, "0");
   const now = new Date();
 
@@ -16,7 +16,8 @@ function getLogFileName(prefix: string) {
     fs.mkdirSync(dateFolder, { recursive: true });
   }
 
-  return path.join(dateFolder, `${prefix}_${timestamp}.log`);
+  const contextPart = context ? `${context}` : "";
+  return path.join(dateFolder, `${prefix}_${contextPart}_${timestamp}.log`);
 }
 
 const commonFormat = winston.format.printf(({ timestamp, level, message, ...meta }) => {
@@ -60,9 +61,27 @@ export const logger = winston.createLogger({
   ],
 });
 
-export const createContextLogger = (context: string) => ({
-  info: (message: string, meta = {}) => logger.info(message, { context, ...meta }),
-  error: (message: string, meta = {}) => logger.error(message, { context, ...meta }),
-  warn: (message: string, meta = {}) => logger.warn(message, { context, ...meta }),
-  debug: (message: string, meta = {}) => logger.debug(message, { context, ...meta }),
-});
+export const createContextLogger = (context: string) => {
+  const logger = winston.createLogger({
+    level: process.env.LOG_LEVEL || "info",
+    transports: [
+      new winston.transports.Console({ format: consoleFormat }),
+      new winston.transports.File({
+        filename: getLogFileName("error", context),
+        level: "error",
+        format: fileFormat,
+      }),
+      new winston.transports.File({
+        filename: getLogFileName("combined", context),
+        format: fileFormat,
+      }),
+    ],
+  });
+
+  return {
+    info: (message: string) => logger.info(message),
+    error: (message: string) => logger.error(message),
+    warn: (message: string) => logger.warn(message),
+    debug: (message: string) => logger.debug?.(message),
+  };
+};

@@ -133,7 +133,6 @@ export async function updateInventoryOnSupabase(inventoryBySkuName: InventoryByS
         on_hand: inv.on_hand,
         reserved: inv.reserved,
         free: inv.free,
-        updated_at: new Date().toISOString(),
       });
     }
   }
@@ -144,6 +143,7 @@ export async function updateInventoryOnSupabase(inventoryBySkuName: InventoryByS
   }
 
   if (inserts.length > 0) {
+    console.log(inserts);
     const { error: insertError } = await supabaseDataProcessing.from("skus_skulabs").upsert(inserts, { onConflict: "master_sku" });
 
     if (insertError) throw new Error(`Insert upsert failed: ${insertError.message}`);
@@ -151,7 +151,7 @@ export async function updateInventoryOnSupabase(inventoryBySkuName: InventoryByS
   }
 
   if (skipped.length > 0) {
-    logger.warn(`Skipped ${skipped.length} SKUs due to unmatched patterns.`);
+    logger.warn(`Skipped ${skipped.length} SKUs.`);
   }
 }
 

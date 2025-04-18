@@ -1,9 +1,10 @@
 import moment from "moment";
 import { fetchOrderInfo, getSkuCountFromOrders } from "./sales";
-import { getInventoryBySkuName, getSkuLabsItemsMap, updateInventoryOnSupabase, updateSupabaseInventoryDraft } from "./skulabsInventory";
+import { getInventoryBySkuName, getSkuLabsItemsMap } from "./skulabsInventory";
 import { readFinalOrderListCSV, updateToSupabase } from "./uploadFinalOrderList";
 import path from "path";
 import { compareCSVs } from "./compareDbCsv";
+import { updateInventoryOnSupabase, updateSupabaseInventoryDraft } from "./updateInventorySupabase";
 
 async function finalOrderList() {
   const csvFilePath = path.resolve(__dirname, "final_order_list.csv");

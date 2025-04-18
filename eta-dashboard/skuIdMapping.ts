@@ -1,8 +1,10 @@
 import { getTimestamp } from "../constants/constants";
-import { logger } from "../constants/logger";
+import { logger, createContextLogger } from "../constants/logger";
 import { getSKUByItemIDs, getSkuLabsItemsMap } from "./skulabsInventory";
 import fs from "fs";
 import path from "path";
+
+const contextLogger = createContextLogger("sku_id_mapping");
 
 async function getSkuIDMapping() {
   const skuLabsItemsMap = await getSkuLabsItemsMap();
@@ -12,7 +14,7 @@ async function getSkuIDMapping() {
   const results: any[] = [];
   const delayBetweenRequests = 500;
 
-  logger.info(`[start] Getting SKU-ID Mapping...\n[INFO] Valid item IDs: ${skuIDs.length}`);
+  contextLogger.info(`[start] Getting SKU-ID Mapping...\n[INFO] Valid item IDs: ${skuIDs.length}`);
 
   for (let i = 0; i < skuIDs.length; i += batchSize) {
     const batch = skuIDs.slice(i, i + batchSize);
@@ -24,14 +26,14 @@ async function getSkuIDMapping() {
 
       if (Array.isArray(batchData)) {
         results.push(...batchData);
-        logger.info(`Successfully inserted batch ${i / batchSize}`);
+        contextLogger.info(`Successfully inserted batch ${i / batchSize}`);
       } else {
-        logger.info(`Unexpected response at batch ${i / batchSize}:`, batchData);
+        contextLogger.info(`Unexpected response at batch ${i / batchSize}:\n${JSON.stringify(batchData, null, 2)}`);
       }
     } catch (error: any) {
       const status = error.response?.status;
       const apiMessage = error.response?.data?.message || JSON.stringify(error.response?.data);
-      logger.error(`[error] Failed batch ${i / batchSize} (Status ${status}): ${apiMessage}`);
+      contextLogger.error(`[error] Failed batch ${i / batchSize} (Status ${status}): ${apiMessage}`);
     }
   }
 
@@ -40,7 +42,7 @@ async function getSkuIDMapping() {
   fs.writeFileSync(outputPath, JSON.stringify(results, null, 2), "utf-8");
   fs.writeFileSync(outputPathReuse, JSON.stringify(results, null, 2), "utf-8");
 
-  logger.info(`[end] Finished SKU-ID Mapping and exporting json files.`);
+  contextLogger.info(`[end] Finished SKU-ID Mapping and exporting json files.`);
   //   return inventoryBySkuName;
 }
 

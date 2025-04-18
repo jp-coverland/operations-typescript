@@ -88,7 +88,7 @@ async function updateContainerDates() {
 
       if (!match) {
         skipped.push(entry);
-        logger.warn(`[skip] no container in supabase for ${name}`);
+        logger.warn(`skipped, no container in supabase for ${name}`);
       } else if (match.arrived_at_warehouse !== eta) {
         updates.push({
           id: match.id,
@@ -106,8 +106,7 @@ async function updateContainerDates() {
       if (error) {
         logger.error("[error] Upsert failed:", error.message);
       } else {
-        logger.info(`[success] ${updates.length} containers updated via upsert.`);
-        logger.info(updates);
+        logger.info(`[success] ${updates.length} containers updated via upsert\n${JSON.stringify(updates, null, 2)}.`);
       }
     } else {
       logger.info("[success] No rows updated.");
