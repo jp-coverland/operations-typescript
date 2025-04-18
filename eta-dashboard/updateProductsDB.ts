@@ -100,7 +100,7 @@ async function updateProductsDB() {
   while (hasMore) {
     const { data: products, error } = await supabase
       .from("products_duplicate_ji")
-      .select(`id, type, display_set, "skulabs SKU"`)
+      .select(`id, type, display_set, "skulabs SKU", preorder, preorder_discount, preorder_date`)
       .order("id", { ascending: true })
       .range(offset, offset + BATCH_SIZE - 1);
 
