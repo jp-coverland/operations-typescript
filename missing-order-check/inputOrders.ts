@@ -1,7 +1,7 @@
 import { readCSVOrderNumbers, getSupabaseQuery, mapOrderItemsToCartItems, generateSkuLabOrderInput, postSkuLabsOrder, delay } from "./functions";
 import { CustomerInfo, ShippingAddress, SkuLabOrderInput, SkuLabOrderResponse } from "./types";
 
-async function main() {
+async function inputOrder() {
   const csvFilePath = "./missing-order-check/missing-orders.csv";
 
   try {
@@ -58,3 +58,5 @@ async function main() {
     console.error("Error processing CSV:", error);
   }
 }
+
+inputOrder();
