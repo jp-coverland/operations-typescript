@@ -128,7 +128,6 @@ export async function updateSupabaseInventoryDraft(inventoryBySkuName: Inventory
         on_hand: inv.on_hand,
         reserved: inv.reserved,
         free: inv.free,
-        updated_at: new Date().toISOString(),
       });
     }
   }
