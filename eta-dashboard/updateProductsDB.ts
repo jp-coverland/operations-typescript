@@ -124,7 +124,7 @@ export async function updateProductsDB() {
       const displaySet = product["display_set"];
       const type = product["type"];
 
-      if (type === "Floor Mats") continue;
+      if (type === "Floor Mats" || type === "Car Covers") continue;
 
       let matches: Array<{ preorder: boolean; next_container_date: string }> = [];
 
@@ -184,3 +184,9 @@ export async function updateProductsDB() {
 
   logger.warn("Not on skulabs:", allNotFound);
 }
+
+async function updateProductsDbRun() {
+  await updateProductsDB();
+}
+
+updateProductsDbRun();

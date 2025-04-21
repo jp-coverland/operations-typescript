@@ -46,4 +46,8 @@ async function getSkuIDMapping() {
   //   return inventoryBySkuName;
 }
 
-getSkuIDMapping();
+async function skuIdMappingRun() {
+  await getSkuIDMapping();
+}
+
+skuIdMappingRun();

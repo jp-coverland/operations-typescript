@@ -1,7 +1,7 @@
 import moment from "moment";
 import { fetchOrderInfo, getSkuCountFromOrders } from "./sales";
 import { getInventoryBySkuName, getSkuLabsItemsMap } from "./skulabsInventory";
-import { readFinalOrderListCSV, updateToSupabase } from "./uploadFinalOrderList";
+import { readFinalOrderListCSV, uploadFinalOrderList } from "./uploadFinalOrderList";
 import path from "path";
 import { compareCSVs } from "./compareDbCsv";
 import { updateInventoryOnSupabase, updateSupabaseInventoryDraft } from "./updateInventorySupabase";
@@ -10,19 +10,10 @@ async function finalOrderList() {
   const csvFilePath = path.resolve(__dirname, "final_order_list.csv");
   const finalOrderCSV = readFinalOrderListCSV(csvFilePath);
 
-  await updateToSupabase(finalOrderCSV);
+  await uploadFinalOrderList(finalOrderCSV);
 }
 
 // finalOrderList();
-
-async function supabaseSkuInventory() {
-  const skuLabsItemsMap = await getSkuLabsItemsMap();
-  const inventoryBySkuName = getInventoryBySkuName(skuLabsItemsMap);
-
-  await updateInventoryOnSupabase(inventoryBySkuName);
-}
-
-// supabaseSkuInventory();
 
 async function getSales() {
   const orderInfo = await fetchOrderInfo();
@@ -44,4 +35,11 @@ async function updateInventoryDraft() {
 
 // updateInventoryDraft();
 
-// compareCSVs();
+async function updateInventory() {
+  const itemsMap = await getSkuLabsItemsMap();
+  const inventoryBySkuName = await getInventoryBySkuName(itemsMap);
+
+  await updateInventoryOnSupabase(inventoryBySkuName);
+}
+
+// updateInventory();

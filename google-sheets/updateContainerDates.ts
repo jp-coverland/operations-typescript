@@ -128,5 +128,9 @@ async function updateContainerDates() {
   }
 }
 
-updateContainerDates();
-updateEtaForSkus();
+async function updateContainerDatesRun() {
+  await updateContainerDates();
+  await updateEtaForSkus();
+}
+
+updateContainerDatesRun();

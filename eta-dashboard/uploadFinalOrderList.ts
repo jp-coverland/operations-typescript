@@ -1,5 +1,4 @@
 import fs from "fs";
-import path from "path";
 import { parse } from "papaparse";
 import { logger } from "../constants/logger";
 import { supabaseDataProcessing } from "../constants/constants";
@@ -44,7 +43,7 @@ export function readFinalOrderListCSV(csvFilePath: string) {
   return finalOrderListData;
 }
 
-export async function updateToSupabase(csvData: any) {
+export async function uploadFinalOrderList(csvData: any) {
   logger.info(`[start] update final order list to Supabase...`);
 
   try {
