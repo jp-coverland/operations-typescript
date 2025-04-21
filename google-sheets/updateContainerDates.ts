@@ -1,12 +1,14 @@
 import { google } from "googleapis";
 import { authorize } from "./authClient";
-import { logger } from "../constants/logger";
+import { createContextLogger } from "../constants/logger";
 import { supabaseDataProcessing } from "../constants/constants";
+
+const contextLogger = createContextLogger("update_container_dates");
 
 async function getContainerDatesFromSheets(auth: any) {
   const sheets = google.sheets({ version: "v4", auth });
 
-  logger.info(`[start] Getting container dates from Production Schedule Sheets...`);
+  contextLogger.info(`[start] Getting container dates from Production Schedule Sheets...`);
   const sheetID = "11UzJ_t-oikbh5uF1F5mKTtuIP-KsaZq1Igr3dMciMX0";
   const range = "Shipping Schedule (Final)!A2:C";
 
@@ -15,7 +17,7 @@ async function getContainerDatesFromSheets(auth: any) {
     const rows = response.data.values;
 
     if (!rows || rows.length === 0) {
-      logger.info("No data returned from Production Schedule sheets.");
+      contextLogger.info("No data returned from Production Schedule sheets.");
       return [];
     }
 
@@ -45,7 +47,7 @@ async function getContainerDatesFromSheets(auth: any) {
 
     return data;
   } catch (error) {
-    logger.error("Failed to read data:", error);
+    contextLogger.error(`Failed to read data:\n${JSON.stringify(error, null, 2)}`);
     return [];
   }
 }
@@ -58,6 +60,16 @@ async function getSupabaseContainers() {
   }
 
   return { data: data, error: null };
+}
+
+async function updateEtaForSkus() {
+  const { error } = await supabaseDataProcessing.rpc("update_eta_for_all_skus");
+
+  if (error) {
+    contextLogger.error(`Update ETA RPC call failed: ${error.message}`);
+  } else {
+    contextLogger.info("Update ETA RPC executed successfully.");
+  }
 }
 
 async function updateContainerDates() {
@@ -88,7 +100,7 @@ async function updateContainerDates() {
 
       if (!match) {
         skipped.push(entry);
-        logger.warn(`skipped, no container in supabase for ${name}`);
+        contextLogger.warn(`skipped, no container in supabase for ${name}`);
       } else if (match.arrived_at_warehouse !== eta) {
         updates.push({
           id: match.id,
@@ -104,16 +116,17 @@ async function updateContainerDates() {
       const { error } = await supabaseDataProcessing.from("containers").upsert(updates, { onConflict: "name" });
 
       if (error) {
-        logger.error("[error] Upsert failed:", error.message);
+        contextLogger.error(`[error] Upsert failed:\n${JSON.stringify(error, null, 2)}`);
       } else {
-        logger.info(`[success] ${updates.length} containers updated via upsert\n${JSON.stringify(updates, null, 2)}.`);
+        contextLogger.info(`[success] ${updates.length} containers updated via upsert\n${JSON.stringify(updates, null, 2)}.`);
       }
     } else {
-      logger.info("[success] No rows updated.");
+      contextLogger.info("[success] No rows updated.");
     }
   } catch (error) {
-    logger.error("Execution failed:", error);
+    contextLogger.error(`Execution failed:\n${JSON.stringify(error, null, 2)}`);
   }
 }
 
 updateContainerDates();
+updateEtaForSkus();
