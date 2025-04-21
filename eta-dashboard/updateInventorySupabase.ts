@@ -133,6 +133,7 @@ export async function updateInventoryOnSupabase(inventoryBySkuName: InventoryByS
         on_hand: inv.on_hand,
         reserved: inv.reserved,
         free: inv.free,
+        updated_at: new Date().toISOString(),
       });
     }
   }

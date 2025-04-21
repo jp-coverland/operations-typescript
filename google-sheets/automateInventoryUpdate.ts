@@ -7,7 +7,7 @@ import { DateTime } from "luxon";
 async function updateGoogleSheetsInventory(auth: any) {
   const sheets = google.sheets({ version: "v4", auth });
 
-  logger.info(`[start] Getting SKU-ID Mapping...`);
+  logger.info(`[start] Updating inventory count on google sheets...`);
 
   const itemsMap = await getSkuLabsItemsMap();
   const inventoryBySkuName = await getInventoryBySkuName(itemsMap);
