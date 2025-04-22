@@ -21,7 +21,7 @@ async function readPackingListCSV(csvFilePath: string) {
 
   if (parsed.errors.length) {
     logger.error("Parsing errors:", parsed.errors);
-    return;
+    throw new Error(`CSV parsing failed: ${parsed.errors.length} errors`);
   }
 
   return parsed.data;
@@ -64,3 +64,12 @@ async function updatePackingListToSupabase(csvData: PackingList[]) {
     logger.info(`[end] Finished updating received quantities to Supabase.`);
   }
 }
+
+async function runPackingListUpload() {
+  const csvPath = path.resolve(__dirname, "packing_list.csv");
+  const packingListCSV = await readPackingListCSV(csvPath);
+
+  await updatePackingListToSupabase(packingListCSV);
+}
+
+runPackingListUpload();

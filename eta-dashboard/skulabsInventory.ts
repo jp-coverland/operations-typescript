@@ -59,7 +59,7 @@ export async function getSKUByItemIDs(skuIDs: string[]) {
   return response.data;
 }
 
-export function getInventoryBySkuName(skuLabsItemsMap: any) {
+export async function getInventoryBySkuName(skuLabsItemsMap: any) {
   // const logger = getLogger(__dirname, "inventory-by-sku-name");
   const filePath = path.resolve(__dirname, `most-recent-sku-id-map.json`);
   const rawData = fs.readFileSync(filePath, "utf-8");

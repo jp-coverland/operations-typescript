@@ -2,6 +2,7 @@ import fs from "fs";
 import { parse } from "papaparse";
 import { logger } from "../constants/logger";
 import { supabaseDataProcessing } from "../constants/constants";
+import path from "path";
 
 interface FinalOrderItem {
   container: string;
@@ -68,3 +69,12 @@ export async function uploadFinalOrderList(csvData: any) {
     logger.error("[exception] Upload process crashed:", error);
   }
 }
+
+async function runUploadFinalOrderList() {
+  const csvFilePath = path.resolve(__dirname, "final_order_list.csv");
+  const finalOrderCSV = readFinalOrderListCSV(csvFilePath);
+
+  await uploadFinalOrderList(finalOrderCSV);
+}
+
+runUploadFinalOrderList();
