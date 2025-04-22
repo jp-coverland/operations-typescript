@@ -16,8 +16,8 @@ function getLogFileName(prefix: string, context?: string) {
     fs.mkdirSync(dateFolder, { recursive: true });
   }
 
-  const contextPart = context ? `${context}` : "";
-  return path.join(dateFolder, `${prefix}_${contextPart}_${timestamp}.log`);
+  const contextPart = context ? `_${context}` : "";
+  return path.join(dateFolder, `${prefix}${contextPart}_${timestamp}.log`);
 }
 
 const commonFormat = winston.format.printf(({ timestamp, level, message, ...meta }) => {
