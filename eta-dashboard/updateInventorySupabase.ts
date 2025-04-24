@@ -12,7 +12,7 @@ async function getSupabaseInventory(tableName: string) {
   return { data: data, error: null };
 }
 
-export async function updateSupabaseInventoryDraft(inventoryBySkuName: InventoryBySkuName) {
+export async function updateSupabaseInventorySkuLabs(inventoryBySkuName: InventoryBySkuName) {
   logger.info(`[start] starting uploading inventory count on to Supabase...`);
   const supabaseSKUs = await getSupabaseInventory("skus_skulabs_test_eta");
   const supabaseMap: Record<string, any> = [];

@@ -1,5 +1,5 @@
 import { getTimestamp } from "../constants/constants";
-import { logger, createContextLogger } from "../constants/logger";
+import { createContextLogger } from "../constants/logger";
 import { getSKUByItemIDs, getSkuLabsItemsMap } from "./skulabsInventory";
 import fs from "fs";
 import path from "path";

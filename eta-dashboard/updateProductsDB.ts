@@ -124,7 +124,7 @@ export async function updateProductsDB() {
       const displaySet = product["display_set"];
       const type = product["type"];
 
-      if (type === "Floor Mats" || type === "Car Covers") continue;
+      if (type === "Floor Mats") continue;
 
       let matches: Array<{ preorder: boolean; next_container_date: string }> = [];
 

@@ -61,6 +61,9 @@ export async function uploadFinalOrderList(csvData: any) {
       logger.warn(`[warn] Some rows failed to insert:`);
       for (const item of data) {
         logger.warn(`  → Container: ${item.container}, SKU: ${item.sku}, Reason: ${item.reason}`);
+
+        // check if final_order_list has a unique constraint.
+        // and it producing success msges, even though it didn't insert any rows.
       }
     } else {
       logger.info(`[success] All rows uploaded successfully.`);
