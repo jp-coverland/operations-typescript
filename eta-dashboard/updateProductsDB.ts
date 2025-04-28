@@ -1,11 +1,11 @@
-import { supabase, supabaseDataProcessing } from "../constants/constants";
+import { supabase, supabaseCoverlandDB } from "../constants/constants";
 import fs from "fs";
 import Papa from "papaparse";
 import path = require("path");
 import { logger } from "../constants/logger";
 
 async function getSkus() {
-  const { data, error } = await supabaseDataProcessing.from("skus_skulabs").select("*");
+  const { data, error } = await supabaseCoverlandDB.from("skus_skulabs").select("*");
 
   if (error) {
     throw new Error(`Supabase query failed: ${JSON.stringify(error, null, 2)}`);

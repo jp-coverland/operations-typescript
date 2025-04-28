@@ -1,7 +1,7 @@
 import fs from "fs";
 import { parse } from "papaparse";
 import { logger } from "../constants/logger";
-import { supabaseDataProcessing } from "../constants/constants";
+import { supabaseCoverlandDB } from "../constants/constants";
 import path from "path";
 
 interface FinalOrderItem {
@@ -48,7 +48,7 @@ export async function uploadFinalOrderList(csvData: any) {
   logger.info(`[start] update final order list to Supabase...`);
 
   try {
-    const { data, error } = await supabaseDataProcessing.rpc("upload_final_order_list", {
+    const { data, error } = await supabaseCoverlandDB.rpc("upload_final_order_list", {
       data: csvData,
     });
 

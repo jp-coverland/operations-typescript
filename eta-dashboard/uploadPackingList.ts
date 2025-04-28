@@ -2,7 +2,7 @@ import fs, { readFile } from "fs/promises";
 import path from "path";
 import { parse } from "papaparse";
 import { logger } from "../constants/logger";
-import { supabaseDataProcessing } from "../constants/constants";
+import { supabaseCoverlandDB } from "../constants/constants";
 
 interface PackingList {
   pi_number: string;
@@ -30,7 +30,7 @@ async function readPackingListCSV(csvFilePath: string) {
 async function updatePackingListToSupabase(csvData: PackingList[]) {
   logger.info(`[start] Starting update packing list to Supabase...`);
 
-  const { data: folData, error } = await supabaseDataProcessing.rpc("get_final_order_list");
+  const { data: folData, error } = await supabaseCoverlandDB.rpc("get_final_order_list");
 
   if (error) {
     logger.error("Failed to fetch final order list info from Supabase", error);
@@ -54,7 +54,7 @@ async function updatePackingListToSupabase(csvData: PackingList[]) {
     }
   }
 
-  const { error: updateError } = await supabaseDataProcessing.rpc("update_received_quantities", {
+  const { error: updateError } = await supabaseCoverlandDB.rpc("update_received_quantities", {
     updates,
   });
 

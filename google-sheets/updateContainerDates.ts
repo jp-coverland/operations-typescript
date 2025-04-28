@@ -1,7 +1,7 @@
 import { google } from "googleapis";
 import { authorize } from "./authClient";
 import { createContextLogger } from "../constants/logger";
-import { supabaseDataProcessing } from "../constants/constants";
+import { supabaseCoverlandDB } from "../constants/constants";
 
 const contextLogger = createContextLogger("update_container_dates");
 
@@ -53,7 +53,7 @@ async function getContainerDatesFromSheets(auth: any) {
 }
 
 async function getSupabaseContainers() {
-  const { data, error } = await supabaseDataProcessing.from(`containers`).select("id, name, arrived_at_warehouse");
+  const { data, error } = await supabaseCoverlandDB.from(`containers`).select("id, name, arrived_at_warehouse");
 
   if (error) {
     throw new Error(`Supabase query failed: ${JSON.stringify(error, null, 2)}`);
@@ -63,7 +63,7 @@ async function getSupabaseContainers() {
 }
 
 async function updateEtaForSkus() {
-  const { error } = await supabaseDataProcessing.rpc("update_eta_for_all_skus");
+  const { error } = await supabaseCoverlandDB.rpc("update_eta_for_all_skus");
 
   if (error) {
     contextLogger.error(`Update ETA RPC call failed: ${error.message}`);
@@ -113,7 +113,7 @@ async function updateContainerDates() {
     }
 
     if (updates.length > 0) {
-      const { error } = await supabaseDataProcessing.from("containers").upsert(updates, { onConflict: "name" });
+      const { error } = await supabaseCoverlandDB.from("containers").upsert(updates, { onConflict: "name" });
 
       if (error) {
         contextLogger.error(`[error] Upsert failed:\n${JSON.stringify(error, null, 2)}`);

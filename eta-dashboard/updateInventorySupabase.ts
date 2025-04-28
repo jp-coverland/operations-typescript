@@ -1,9 +1,9 @@
-import { supabaseDataProcessing } from "../constants/constants";
+import { supabaseCoverlandDB } from "../constants/constants";
 import { logger } from "../constants/logger";
 import { getInventoryBySkuName, getSkuLabsItemsMap, InventoryBySkuName } from "./skulabsInventory";
 
 async function getSupabaseInventory(tableName: string) {
-  const { data, error } = await supabaseDataProcessing.from(`${tableName}`).select("*");
+  const { data, error } = await supabaseCoverlandDB.from(`${tableName}`).select("*");
 
   if (error) {
     throw new Error(`Supabase query failed: ${JSON.stringify(error, null, 2)}`);
@@ -67,12 +67,12 @@ export async function updateSupabaseInventorySkuLabs(inventoryBySkuName: Invento
   }
 
   if (updates.length > 0) {
-    await supabaseDataProcessing.rpc("batch_update_skulabs_inventory_eta", { payload: updates });
+    await supabaseCoverlandDB.rpc("batch_update_skulabs_inventory_eta", { payload: updates });
     logger.info(`Updated ${updates.length} rows.`);
   }
 
   if (inserts.length > 0) {
-    const { error: insertError } = await supabaseDataProcessing.from("skus_skulabs_test_eta").upsert(inserts, { onConflict: "master_sku" });
+    const { error: insertError } = await supabaseCoverlandDB.from("skus_skulabs_test_eta").upsert(inserts, { onConflict: "master_sku" });
 
     if (insertError) throw new Error(`Insert upsert failed: ${insertError.message}`);
     logger.info(`Inserted ${inserts.length} rows.`);
@@ -139,13 +139,13 @@ export async function updateInventoryOnSupabase(inventoryBySkuName: InventoryByS
   }
 
   if (updates.length > 0) {
-    await supabaseDataProcessing.rpc("batch_update_skulabs_inventory", { payload: updates });
+    await supabaseCoverlandDB.rpc("batch_update_skulabs_inventory", { payload: updates });
     logger.info(`Updated ${updates.length} rows.`);
   }
 
   if (inserts.length > 0) {
     console.log(inserts);
-    const { error: insertError } = await supabaseDataProcessing.from("skus_skulabs").upsert(inserts, { onConflict: "master_sku" });
+    const { error: insertError } = await supabaseCoverlandDB.from("skus_skulabs").upsert(inserts, { onConflict: "master_sku" });
 
     if (insertError) throw new Error(`Insert upsert failed: ${insertError.message}`);
     logger.info(`Inserted ${inserts.length} rows.`);
