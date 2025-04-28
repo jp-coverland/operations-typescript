@@ -28,11 +28,14 @@ type SupabaseIDMapping = {
 
 export async function getSkuLabsItemsMap() {
   const url = "https://api.skulabs.com/inventory/get_items_map";
-  const reqeustBody = {
-    data: {},
+  const requestBody = {
+    data: {
+      warehouse_ids: ["62f0fcc0fc3f4e916f865d70", "6751ef41e1c227fbf259535a", "67f96f39c57abe050b867ae0"],
+      store_ids: ["62f0fcbffc3f4e916f865d6a"],
+    },
   };
 
-  const response = await axios.post(url, reqeustBody, {
+  const response = await axios.post(url, requestBody, {
     headers: {
       Authorization: `Bearer ${process.env.SKU_LABS_API_KEY}`,
       "Content-Type": "application/json",
