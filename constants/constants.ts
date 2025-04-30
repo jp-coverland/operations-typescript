@@ -20,6 +20,10 @@ if (!NEXT_PUBLIC_SUPABASE_COVERLAND_DB_URL || !NEXT_PUBLIC_SUPABASE_COVERLAND_DB
 
 export const supabaseCoverlandDB = createClient(NEXT_PUBLIC_SUPABASE_COVERLAND_DB_URL, NEXT_PUBLIC_SUPABASE_COVERLAND_DB_ANON_KEY);
 
+export const supabaseCoverlandSizeChart = createClient(NEXT_PUBLIC_SUPABASE_COVERLAND_DB_URL, NEXT_PUBLIC_SUPABASE_COVERLAND_DB_ANON_KEY, {
+  db: { schema: "size_chart" },
+});
+
 export const authPayload = {
   ApplicationId: "4fd8bf98-d222-48de-a50b-8fd7aa3b8015",
   ApplicationSecret: "725f7757-5cae-462a-86cf-04b4c4deef08",

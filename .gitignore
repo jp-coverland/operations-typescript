@@ -13,6 +13,7 @@ build/
 *.csv
 *.json
 *.log
+*.xlsx
 
 # OS files
 .DS_Store
