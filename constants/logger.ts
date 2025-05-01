@@ -2,6 +2,13 @@ import winston from "winston";
 import path from "path";
 import fs from "fs";
 
+export type ContextLogger = {
+  info: (message: string) => winston.Logger;
+  error: (message: string) => winston.Logger;
+  warn: (message: string) => winston.Logger;
+  debug: (message: string) => winston.Logger;
+};
+
 function getLogFileName(prefix: string, context?: string) {
   const pad = (n: number) => String(n).padStart(2, "0");
   const now = new Date();

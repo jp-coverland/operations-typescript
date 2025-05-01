@@ -23,7 +23,7 @@ async function updateGoogleSheetsLinnworks(auth: any) {
   try {
     await sheets.spreadsheets.values.update({
       spreadsheetId: "18xtUfZuTRhJ91nfSZstk_Jn28luXhRUfiZjiB_WOiIo",
-      range: "SKULabs Inventory (Pauline Only)!L1",
+      range: "SKULabs Inventory (Pauline Only)!A1",
       valueInputOption: "RAW",
       requestBody: {
         values: [[`Last updated: ${timestamp}`]],
@@ -31,7 +31,7 @@ async function updateGoogleSheetsLinnworks(auth: any) {
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: "18xtUfZuTRhJ91nfSZstk_Jn28luXhRUfiZjiB_WOiIo",
-      range: "SKULabs Inventory (Pauline Only)!L5",
+      range: "SKULabs Inventory (Pauline Only)!A5",
       valueInputOption: "RAW",
       requestBody: {
         values: dataToWrite,

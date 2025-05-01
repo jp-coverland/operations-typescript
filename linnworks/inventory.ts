@@ -42,13 +42,13 @@ async function getLinnworksInventory(entriesPerPage: number, pageNumber: number,
 export async function getLinnworksInventoryComplete() {
   const entriesPerPage = 400;
   const pageNumber = 1;
-  const ICARCOVER_WMS_WAREHOUSE_ID = process.env.ICARCOVER_WMS_WAREHOUSE_ID;
+  const DEFAULT_WAREHOUSE_ID = process.env.DEFAULT_WAREHOUSE_ID;
   const excludeComposites = true;
   const AUTH_TOKEN = await getAuthToken();
 
   let totalData: any[] = [];
 
-  const firstPage = await getLinnworksInventory(entriesPerPage, pageNumber, ICARCOVER_WMS_WAREHOUSE_ID, excludeComposites, AUTH_TOKEN);
+  const firstPage = await getLinnworksInventory(entriesPerPage, pageNumber, DEFAULT_WAREHOUSE_ID, excludeComposites, AUTH_TOKEN);
   totalData = totalData.concat(firstPage.Data);
   const totalPages = firstPage.TotalPages;
 
@@ -56,7 +56,7 @@ export async function getLinnworksInventoryComplete() {
 
   for (let page = 2; page <= totalPages; page++) {
     logger.info(`[info] Getting Inventory Page ${page}/${totalPages}`);
-    const result = await getLinnworksInventory(entriesPerPage, page, ICARCOVER_WMS_WAREHOUSE_ID, excludeComposites, AUTH_TOKEN);
+    const result = await getLinnworksInventory(entriesPerPage, page, DEFAULT_WAREHOUSE_ID, excludeComposites, AUTH_TOKEN);
     totalData = totalData.concat(result.Data);
   }
 
