@@ -2,18 +2,18 @@ import { google } from "googleapis";
 import { authorize } from "./authClient";
 import { logger } from "../constants/logger";
 import { DateTime } from "luxon";
-import { getLinnworksInventoryComplete } from "../linnworks/inventory";
+import { getCombinedInventory } from "../linnworks/inventory";
 
 async function updateGoogleSheetsLinnworks(auth: any) {
   const sheets = google.sheets({ version: "v4", auth });
 
   logger.info(`[start] Getting Linnworks Inventory...`);
 
-  const linnworksInventory = await getLinnworksInventoryComplete();
+  const defaultWarehouseInventory = await getCombinedInventory();
 
-  logger.info(`[info] Number of SKUs: ${linnworksInventory.length}`);
+  logger.info(`[info] Number of SKUs: ${defaultWarehouseInventory.length}`);
 
-  const dataToWrite = linnworksInventory.map((item) => {
+  const dataToWrite = defaultWarehouseInventory.map((item) => {
     const { ItemNumber, Quantity, InOrder, Available } = item;
     return [ItemNumber, Quantity, InOrder, Available];
   });
