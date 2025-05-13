@@ -29,6 +29,12 @@ async function updateGoogleSheetsLinnworks(auth: any) {
         values: [[`Last updated: ${timestamp}`]],
       },
     });
+
+    await sheets.spreadsheets.values.clear({
+      spreadsheetId: "18xtUfZuTRhJ91nfSZstk_Jn28luXhRUfiZjiB_WOiIo",
+      range: "SKULabs Inventory (Pauline Only)!A5:D",
+    });
+
     await sheets.spreadsheets.values.update({
       spreadsheetId: "18xtUfZuTRhJ91nfSZstk_Jn28luXhRUfiZjiB_WOiIo",
       range: "SKULabs Inventory (Pauline Only)!A5",
