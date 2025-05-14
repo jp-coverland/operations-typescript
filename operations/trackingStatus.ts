@@ -2,7 +2,7 @@ import path from "path";
 import Papa from "papaparse";
 import { readFileSync, writeFileSync } from "fs";
 
-const filePath = "./operations/tracking_status.csv";
+const filePath = path.resolve(__dirname, "tracking_status.csv");
 const csvText = readFileSync(filePath, "utf-8");
 const parsed = Papa.parse<{ [key: string]: string }>(csvText, { header: true, skipEmptyLines: true });
 const orderData = parsed.data;
