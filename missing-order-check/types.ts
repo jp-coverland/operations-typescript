@@ -91,11 +91,20 @@ export type ShippingAddress = {
   shipping_address_country: string;
 };
 
+export type Address = {
+  address_line_1: string;
+  address_line_2: string;
+  address_city: string;
+  address_state: string;
+  address_postal_code: string;
+  address_country: string;
+};
+
 export type SkuLabOrderInput = {
   orderNumber: string;
   cartItems: TCartItem[];
   orderTotal: number;
-  shippingAddress: ShippingAddress;
+  shippingAddress: Address;
   customerInfo: CustomerInfo;
   paymentMethod: string;
   tax: number;
@@ -159,4 +168,64 @@ export type SkuLabOrderResponse = {
   };
   error?: string;
   status?: number;
+};
+
+export type LinnWorksOrderRequest = {
+  location: string;
+  orders: LinnWorksOrder[];
+};
+
+export type LinnWorksOrder = {
+  Source: string;
+  SubSource: string;
+  ReferenceNumber: string;
+  SecondaryReferenceNumber: string;
+  ReceivedDate: string; // ISO date string
+  DispatchBy: string; // ISO date string
+  UseChannelTax: boolean;
+  AutomaticallyLinkBySKU: boolean;
+  MatchPaymentMethodTag: string;
+  PaymentMethodName: string;
+  PaymentStatus: string;
+  Currency: string;
+  OrderIdentifierTags: string[];
+  BillingAddress: LinnWorksAddress;
+  DeliveryAddress: LinnWorksAddress;
+  OrderItems: LinnWorksOrderItem[];
+  Notes: LinnWorksNote[];
+  PostalServiceCost: number;
+  PostalServiceDiscount: number;
+  PostalServiceTaxRate: number;
+};
+
+export type LinnWorksAddress = {
+  FullName: string;
+  Address1: string;
+  Address2?: string;
+  Town: string;
+  Region: string;
+  PostCode: string;
+  Country: string;
+  PhoneNumber: string;
+  EmailAddress: string;
+};
+
+export type LinnWorksOrderItem = {
+  TaxCostInclusive: boolean;
+  UseChannelTax: boolean;
+  PricePerUnit: number;
+  Qty: number;
+  TaxRate: number;
+  LineDiscount: number;
+  ChannelSKU: string;
+  ItemNumber: string;
+  IsService: boolean;
+  ItemTitle: string;
+};
+
+type LinnWorksNote = {
+  Note: string;
+  NoteEntryDate: string; // ISO date string
+  NoteUserName: string;
+  Internal: boolean;
 };

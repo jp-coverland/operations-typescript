@@ -5,7 +5,11 @@ import { createContextLogger } from "../constants/logger";
 import { authorize } from "./authClient";
 
 async function getCarCoverSizeChart() {
-  const { data, error } = await supabaseCoverlandSizeChart.from("car_cover_size_chart_shared_view").select("*").order("id", { ascending: true });
+  const { data, error } = await supabaseCoverlandSizeChart
+    .from("car_cover_size_chart_shared_view")
+    .select("*")
+    .eq("vehicle_type", "car")
+    .order("id", { ascending: true });
 
   if (error) {
     throw new Error(`Supabase query failed: ${JSON.stringify(error, null, 2)}`);
@@ -17,7 +21,7 @@ async function getCarCoverSizeChart() {
 async function getSuvCoverSizeChart() {
   const { data, error } = await supabaseCoverlandSizeChart
     .from("car_cover_size_chart_shared_view")
-    .select("id, f_number, vehicle_type, concatenated, car_cover_size, car_cover_custom_size, vehicle_length")
+    .select("*")
     .eq("vehicle_type", "suv")
     .order("id", { ascending: true });
 
@@ -30,9 +34,8 @@ async function getSuvCoverSizeChart() {
 
 async function getTruckCoverSizeChart() {
   const { data, error } = await supabaseCoverlandSizeChart
-    .from("product_vehicle_size")
+    .from("car_cover_size_chart_shared_view")
     .select("*")
-    .eq("product_type", "car cover")
     .eq("vehicle_type", "truck")
     .order("id", { ascending: true });
 

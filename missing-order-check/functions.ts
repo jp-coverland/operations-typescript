@@ -3,8 +3,21 @@ import dotenv from "dotenv";
 import fs from "fs";
 import csv from "csv-parser";
 import { DateTime } from "luxon";
-import { TCartItem, ShippingAddress, MONARC_SKUS, SkuLabOrderInput, SkuLabOrderDTO, SkuLabOrderResponse } from "./types";
-import { determineDeliveryByDateByShippingState, determineEarliestShippingDate } from "./deliveryDateUtils";
+import {
+  TCartItem,
+  ShippingAddress,
+  MONARC_SKUS,
+  SkuLabOrderInput,
+  SkuLabOrderDTO,
+  SkuLabOrderResponse,
+  LinnWorksOrderRequest,
+  LinnWorksOrder,
+  CustomerInfo,
+  Address,
+  LinnWorksOrderItem,
+} from "./types";
+import { determineDeliveryByDateByShippingState, determineEarliestShippingDate, determineLatestShippingDate } from "./deliveryDateUtils";
+import { getAuthToken } from "../linnworks/authorize";
 
 dotenv.config();
 const NEXT_PUBLIC_SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -51,8 +64,9 @@ export async function getSupabaseQuery(orderNumbers: string[]) {
     return { data: [], error: null };
   }
 
-  const ordersTableSelect =
-    "order_id, total_amount, total_tax, customer_name, customer_email, customer_phone, payment_gateway, shipping_address_line_1, shipping_address_line_2, shipping_address_city, shipping_address_state, shipping_address_postal_code, shipping_address_country";
+  const ordersTableSelect = `order_id, total_amount, total_tax, customer_name, customer_email, customer_phone, payment_gateway, 
+    shipping_address_line_1, shipping_address_line_2, shipping_address_city, shipping_address_state, shipping_address_postal_code, shipping_address_country, 
+    billing_address_line_1, billing_address_line_2, billing_address_city, billing_address_state, billing_address_postal_code, billing_address_country`;
   const productsTableSelect = `id, sku, type, year_generation, make, model, submodel1, submodel2, submodel3, display_color, display_id, display_set, "skulabs SKU", preorder, preorder_discount, preorder_date, msrp`;
 
   const { data, error } = await supabase
@@ -109,14 +123,14 @@ const calculateTaxPercentage = (taxAmount: number, subtotal: number) => {
   return parseFloat(taxPercentage.toFixed(2));
 };
 
-const generateNote = (cartItems: TCartItem[], paymentMethod: string, shippingAddress: ShippingAddress, taxAmount: number) => {
+const generateNote = (cartItems: TCartItem[], paymentMethod: string, shippingAddress: Address, taxAmount: number) => {
   const subtotal = calculateSubtotal(cartItems);
   const taxPercentage = calculateTaxPercentage(taxAmount, subtotal);
   let remainingTax = taxAmount;
 
   const skuNameQuantity = cartItems.map((cartItem: TCartItem, index: number) => {
     const deliveryDate = determineDeliveryByDateByShippingState(
-      shippingAddress.shipping_address_state ?? "",
+      shippingAddress.address_state ?? "",
       "MM/dd/yyyy",
       cartItem?.preorder ? cartItem?.preorderDate ?? "" : undefined
     );
@@ -247,12 +261,12 @@ export const generateSkuLabOrderInput = async ({
         phone: customerInfo.phoneNumber || "",
         email: customerInfo.email,
         company: "",
-        city: shippingAddress.shipping_address_city || "",
-        country: shippingAddress.shipping_address_country,
-        state: shippingAddress.shipping_address_state || "",
-        zip: shippingAddress.shipping_address_postal_code || "",
-        address: shippingAddress.shipping_address_line_1 || "",
-        address_2: shippingAddress.shipping_address_line_2 || "",
+        city: shippingAddress.address_city || "",
+        country: shippingAddress.address_country,
+        state: shippingAddress.address_state || "",
+        zip: shippingAddress.address_postal_code || "",
+        address: shippingAddress.address_line_1 || "",
+        address_2: shippingAddress.address_line_2 || "",
         method: "2 day free shipping",
       },
       tags: tags,
@@ -320,3 +334,317 @@ export const mapOrderItemsToCartItems = (orderItems: any[]): TCartItem[] => {
 export async function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+export const generateLinnWorksOrderInput = async ({
+  orderNumber,
+  cartItems,
+  shippingAddress,
+  billingAddress,
+  customerInfo,
+  paymentMethod,
+  tax,
+  shipping,
+}: any): Promise<LinnWorksOrderRequest> => {
+  const orders = await mapLinnWorksOrderRequest(orderNumber, cartItems, shippingAddress, billingAddress, customerInfo, paymentMethod, tax, shipping);
+  const location = orderNumber.includes("-PRE-") ? "Virtual Warehouse" : "default";
+  return {
+    location, // Don't know
+    orders,
+  };
+};
+
+export async function mapLinnWorksOrderRequest(
+  orderNumber: string,
+  cartItems: TCartItem[],
+  shippingAddress: Address,
+  billingAddress: Address,
+  customerInfo: CustomerInfo,
+  paymentMethod: string,
+  taxAmount: number,
+  shipping: number
+): Promise<LinnWorksOrder[]> {
+  const subtotal = calculateSubtotal(cartItems);
+  const taxPercentage = calculateTaxPercentage(taxAmount, subtotal);
+
+  // 1. Expand cart items by quantity
+  const expandedCartItems: TCartItem[] = [];
+
+  cartItems.forEach((item) => {
+    const quantity = item.quantity as number;
+    // Create individual items for each quantity
+    for (let i = 0; i < quantity; i++) {
+      // Create a copy of the item with quantity of 1
+      expandedCartItems.push({
+        ...item,
+        quantity: 1,
+      });
+    }
+  });
+
+  // 2. Group expanded items by SKU
+  const groupedBySku = expandedCartItems.reduce<Record<string, TCartItem[]>>((groups, item) => {
+    const sku = item.sku;
+    if (!groups[sku]) {
+      groups[sku] = [];
+    }
+    groups[sku].push(item);
+    return groups;
+  }, {});
+
+  // 3. Calculate totals based on post-discount prices
+  let totalPostDiscountValue = 0;
+  const itemFinancials: any = {};
+
+  // Calculate each item's financial values
+  expandedCartItems.forEach((item, index) => {
+    const rawPrice = item.msrp;
+    const preorderDiscount = item.preorderDiscount || 0;
+    const postDiscountPrice = rawPrice - preorderDiscount;
+
+    // Store financial data for this item
+    itemFinancials[index] = {
+      rawPrice,
+      preorderDiscount,
+      postDiscountPrice,
+    };
+
+    // Add to total post-discount value
+    totalPostDiscountValue += postDiscountPrice;
+  });
+
+  const orders = [];
+
+  // 4. Create one order per item
+  for (let i = 0; i < expandedCartItems.length; i++) {
+    const item = expandedCartItems[i];
+    const financials = itemFinancials[i];
+
+    // Calculate proportion based on post-discount price
+    const proportion = financials.postDiscountPrice / totalPostDiscountValue;
+
+    // Calculate tax for this item
+    const taxableAmount = financials.rawPrice - financials.preorderDiscount;
+    const itemTax = Number(taxableAmount * (taxPercentage / 100));
+
+    // Allocate shipping proportionally
+    const itemShipping = Number(shipping * proportion);
+
+    // Generate suffix for orders except when only one item exists
+    const currentOrderNumber = expandedCartItems.length === 1 ? orderNumber : `${orderNumber}-${i + 1}`;
+
+    // Create the order item
+    const orderItem = await generateLinnWorksOrderItem(item, taxPercentage);
+
+    const order = {
+      Source: "Coverland Website",
+      SubSource: "Coverland",
+      ReferenceNumber: currentOrderNumber,
+      SecondaryReferenceNumber: orderNumber,
+      ReceivedDate: getCurrentDateInPST() as string,
+      DispatchBy: determineLatestShippingDate([item]) as string,
+      DespatchByDate: determineLatestShippingDate([item]) as string,
+      UseChannelTax: true,
+      AutomaticallyLinkBySKU: true,
+      MatchPaymentMethodTag: paymentMethod,
+      PaymentMethodName: paymentMethod,
+      PaymentStatus: "Paid",
+      Currency: "USD",
+      OrderIdentifierTags: generateTags(orderNumber, [item]),
+      BillingAddress: generateLinnWorksAddress(billingAddress, customerInfo),
+      DeliveryAddress: generateLinnWorksAddress(shippingAddress, customerInfo),
+      OrderItems: Array.isArray(orderItem) ? orderItem : [orderItem],
+      Notes: [generateLinnWorksNotes([item], paymentMethod, shippingAddress, itemTax)],
+      PostalServiceCost: itemShipping,
+      PostalServiceDiscount: 0,
+      PostalServiceTaxRate: 0,
+    };
+    orders.push(order);
+  }
+
+  return orders;
+}
+
+function generateLinnWorksNotes(cartItems: TCartItem[], paymentMethod: string, shippingAddress: Address, taxAmount: number) {
+  const note = generateNote(cartItems, paymentMethod, shippingAddress, taxAmount);
+  return {
+    Note: note,
+    NoteEntryDate: getCurrentDateInPST() as string,
+    NoteUserName: "Coverland Website",
+    Internal: true,
+  };
+}
+
+function generateLinnWorksAddress(address: Address, customerInfo: CustomerInfo) {
+  return {
+    FullName: customerInfo.name,
+    Address1: address.address_line_1 || "",
+    Address2: address.address_line_2 || "",
+    Town: address.address_city || "",
+    Region: address.address_state || "",
+    PostCode: address.address_postal_code || "",
+    Country: getCountryName(address.address_country) || "",
+    PhoneNumber: customerInfo.phoneNumber || "",
+    EmailAddress: customerInfo.email,
+  };
+}
+
+export const getCountryName = (isoCode: string, locale = "en") => {
+  return new Intl.DisplayNames([locale], { type: "region" }).of(isoCode);
+};
+
+async function generateLinnWorksOrderItem(cartItem: TCartItem, taxPercentage: number): Promise<any> {
+  // Check if this is a full seat set
+  if (cartItem.displaySet === "Full Seat Set") {
+    try {
+      // Get the component items
+      const components = await getCompositeItems(cartItem.skulabsSKU);
+
+      if (components) {
+        // Create two Linnworks order items, one for front and one for back
+        const orderItems: LinnWorksOrderItem[] = [];
+
+        // Front item
+        const frontItem: LinnWorksOrderItem = {
+          TaxCostInclusive: false,
+          UseChannelTax: true,
+          PricePerUnit: cartItem.msrp || 0, // Split the price evenly between components
+          Qty: cartItem.quantity,
+          TaxRate: taxPercentage,
+          LineDiscount: calculatePreorderDiscountPercentage(cartItem, Number(cartItem.preorderDiscount) || 0),
+          ChannelSKU: components.frontSku,
+          ItemNumber: components.frontSku,
+          IsService: false,
+          ItemTitle: `${cartItem?.yearGeneration || ""} ${cartItem?.make || ""} ${cartItem?.model || ""} Front Seat Cover ${cartItem?.displayColor}`.trim(),
+        };
+
+        // Back item
+        const backItem: LinnWorksOrderItem = {
+          TaxCostInclusive: false,
+          UseChannelTax: true,
+          PricePerUnit: 0, // Split the price evenly between components
+          Qty: cartItem.quantity,
+          TaxRate: 0,
+          LineDiscount: 0,
+          ChannelSKU: components.backSku,
+          ItemNumber: components.backSku,
+          IsService: false,
+          ItemTitle: `${cartItem?.yearGeneration || ""} ${cartItem?.make || ""} ${cartItem?.model || ""} Back Seat Cover ${cartItem?.displayColor}`.trim(),
+        };
+
+        orderItems.push(frontItem, backItem);
+
+        return orderItems;
+      }
+    } catch (error) {
+      console.error(`Failed to process full seat set ${cartItem.sku}:`, error);
+      // Fall back to regular processing if component fetching fails
+    }
+  }
+  const discountPercentage = calculatePreorderDiscountPercentage(cartItem, Number(cartItem.preorderDiscount) || 0);
+
+  const itemName = `${cartItem?.yearGeneration || ""} ${cartItem?.make || ""} ${cartItem?.model || ""} ${cartItem?.submodel1 ? cartItem?.submodel1 : ""} ${
+    cartItem?.submodel2 ? cartItem?.submodel2 : ""
+  }  ${cartItem?.submodel3 ? cartItem?.submodel3 : ""} ${cartItem.type} ${cartItem?.displayID} ${cartItem?.displayColor}`
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return {
+    TaxCostInclusive: false,
+    UseChannelTax: true,
+    PricePerUnit: cartItem.msrp,
+    Qty: cartItem.quantity, // This will always be 1 in our expanded items
+    TaxRate: taxPercentage,
+    LineDiscount: discountPercentage,
+    ChannelSKU: cartItem.skulabsSKU,
+    ItemNumber: cartItem.sku,
+    IsService: false,
+    ItemTitle: itemName,
+  };
+}
+
+// Function to get component items for a full seat set
+export async function getCompositeItems(fullSetSku: string): Promise<{ frontSku: string; backSku: string } | null> {
+  const LINN_WORKS_URL = "https://us-ext.linnworks.net/api";
+  const LIN_WORKS_AUTH_URL = "https://api.linnworks.net/api";
+
+  if (!fullSetSku) throw new Error("Full set SKU is required");
+
+  // 1. Check in Supabase
+  const { data, error } = await supabase.from("linnworks_full_set_component_map").select("front_sku, back_sku").eq("full_set_sku", fullSetSku).single();
+
+  if (!error && data) {
+    console.log(`Found mapping in database for SKU: ${fullSetSku}`);
+    return { frontSku: data.front_sku, backSku: data.back_sku };
+  }
+
+  // 2. If not in database, get from Linnworks
+  console.info(`No mapping found in database for full set SKU: ${fullSetSku}, fetching from Linnworks`);
+  const AUTH_TOKEN = await getAuthToken();
+
+  // First, get the inventory item to get the StockItemId
+  const inventoryItemResponse = await fetch(`${LINN_WORKS_URL}/Inventory/GetInventoryItem?sKU=${encodeURIComponent(fullSetSku)}`, {
+    headers: {
+      Authorization: `${AUTH_TOKEN}`,
+    },
+  });
+  if (!inventoryItemResponse.ok) throw new Error(`Inventory item not found for SKU: ${fullSetSku} | ${inventoryItemResponse.statusText}`);
+  const inventoryItem = await inventoryItemResponse.json();
+
+  // Check if it's actually a composite parent
+  if (!inventoryItem.IsCompositeParent) throw new Error(`${fullSetSku} is not a composite parent`);
+  const fullSetStockItemId = inventoryItem.StockItemId;
+
+  // Now get the compositions
+  const compositionsResponse = await fetch(`${LINN_WORKS_URL}/Inventory/GetInventoryItemCompositions?inventoryItemId=${fullSetStockItemId}`, {
+    headers: { Authorization: AUTH_TOKEN },
+  });
+  if (!compositionsResponse.ok) throw new Error(`Failed to fetch compositions: ${compositionsResponse.statusText}`);
+  const compositions = await compositionsResponse.json();
+
+  const frontComponent = compositions.find((c: any) => c.SKU.includes("-F-"));
+  const backComponent = compositions.find((c: any) => c.SKU.includes("-B-"));
+  if (!frontComponent || !backComponent)
+    throw new Error(`Front or back component not found:\n full: ${fullSetSku} foundFrount: ${!!frontComponent} foundBack: ${!!backComponent}`);
+
+  // Save to database for future use
+  try {
+    const record = {
+      full_set_sku: fullSetSku,
+      front_sku: frontComponent.SKU,
+      back_sku: backComponent.SKU,
+      full_set_stock_item_id: fullSetStockItemId,
+      front_stock_item_id: frontComponent.LinkedStockItemId,
+      back_stock_item_id: backComponent.LinkedStockItemId,
+      updated_at: new Date().toISOString(),
+    };
+
+    await supabase.from("linnworks_full_set_component_map").upsert(record, {
+      onConflict: "full_set_sku",
+      ignoreDuplicates: false,
+    });
+  } catch (dbError) {
+    console.error("Error saving component mapping to database:", dbError);
+    // We'll continue even if saving to DB fails
+  }
+
+  console.log(`Successfully found components for ${fullSetSku}`, {
+    frontSku: frontComponent.SKU,
+    backSku: backComponent.SKU,
+  });
+
+  return { frontSku: frontComponent.SKU, backSku: backComponent.SKU };
+}
+
+export const calculatePreorderDiscountPercentage = (cartItem: TCartItem, preorderDiscount: number): number => {
+  if (!cartItem || typeof cartItem.msrp !== "number" || cartItem.msrp <= 0) {
+    return 0;
+  }
+
+  if (typeof preorderDiscount !== "number" || preorderDiscount <= 0) {
+    return 0;
+  }
+
+  const discountPercentage = (preorderDiscount / cartItem.msrp) * 100;
+
+  return discountPercentage;
+};

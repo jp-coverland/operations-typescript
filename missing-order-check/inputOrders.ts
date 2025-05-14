@@ -1,5 +1,5 @@
 import { readCSVOrderNumbers, getSupabaseQuery, mapOrderItemsToCartItems, generateSkuLabOrderInput, postSkuLabsOrder, delay } from "./functions";
-import { CustomerInfo, ShippingAddress, SkuLabOrderInput, SkuLabOrderResponse } from "./types";
+import { Address, CustomerInfo, SkuLabOrderInput, SkuLabOrderResponse } from "./types";
 
 async function inputOrder() {
   const csvFilePath = "./missing-order-check/missing-orders.csv";
@@ -19,13 +19,13 @@ async function inputOrder() {
           phoneNumber: order.customer_phone,
         };
 
-        const shippingAddress: ShippingAddress = {
-          shipping_address_line_1: order.shipping_address_line_1,
-          shipping_address_line_2: order.shipping_address_line_2,
-          shipping_address_city: order.shipping_address_city,
-          shipping_address_state: order.shipping_address_state,
-          shipping_address_postal_code: order.shipping_address_postal_code,
-          shipping_address_country: order.shipping_address_country,
+        const shippingAddress: Address = {
+          address_line_1: order.shipping_address_line_1,
+          address_line_2: order.shipping_address_line_2,
+          address_city: order.shipping_address_city,
+          address_state: order.shipping_address_state,
+          address_postal_code: order.shipping_address_postal_code,
+          address_country: order.shipping_address_country,
         };
 
         const orderInputBody: SkuLabOrderInput = {

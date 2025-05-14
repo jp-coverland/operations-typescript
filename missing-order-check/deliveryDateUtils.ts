@@ -324,3 +324,31 @@ export const determineEarliestShippingDate = (cartItems: TCartItem[]): string | 
 
   return earliestDate.toISO(); // Returns "YYYY-MM-DDTHH:mm:ss-08:00"
 };
+
+export const determineLatestShippingDate = (cartItems: TCartItem[]): string | null => {
+  if (cartItems.length === 0) return null;
+
+  const shippingDates = cartItems
+    .map((cartItem) => {
+      if (!cartItem?.preorder) {
+        return determineShippingDate(); // Compute new shipping date
+      } else if (cartItem?.preorderDate) {
+        return DateTime.fromISO(cartItem.preorderDate)
+          .setZone("America/Los_Angeles") // Convert to PST
+          .set({ hour: 11, minute: 0, second: 0 }) // Ensure 11 AM PST
+          .toISO(); // Format as ISO 8601
+      }
+      return null;
+    })
+    .filter((date): date is string => !!date); // Remove null values
+
+  if (shippingDates.length === 0) return null;
+
+  // Convert dates to DateTime objects and find the latest one
+  const latestDate = shippingDates
+    .map((date) => DateTime.fromISO(date))
+    .filter((dt) => dt.isValid)
+    .reduce((max, dt) => (dt > max ? dt : max), DateTime.fromISO(shippingDates[0]));
+
+  return latestDate.toISO(); // Returns "YYYY-MM-DDTHH:mm:ss-08:00"
+};
