@@ -43,7 +43,7 @@ function matchLengthNotes() {
 
     return {
       ...row,
-      size: match?.size || "",
+      size: match && match.size ? match.size : row.size,
       custom_size: match?.custom_size || "",
       vehicle_length: match?.vehicle_length || "",
       notes: match?.notes || "",

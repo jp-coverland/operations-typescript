@@ -5,7 +5,7 @@ import { createContextLogger } from "../constants/logger";
 import { authorize } from "../google-sheets/authClient";
 
 async function getCarCoverSizeChart() {
-  const { data, error } = await supabaseCoverlandSizeChart.from("car_cover_size_chart_shared_view").select("*").order("id", { ascending: true });
+  const { data, error } = await supabaseCoverlandSizeChart.rpc("get_ordered_car_covers");
 
   if (error) {
     throw new Error(`Supabase query failed: ${JSON.stringify(error, null, 2)}`);
@@ -20,16 +20,24 @@ async function updateCarCoverSizeChart(auth: any) {
   const sheets = google.sheets({ version: "v4", auth });
 
   const carCoverData = await getCarCoverSizeChart();
-  const carCoverPayload = carCoverData.data.map(({ id, f_number, vehicle_type, concatenated, size, custom_size, vehicle_length, notes }) => [
-    id,
-    f_number,
-    vehicle_type,
-    concatenated,
-    size,
-    custom_size,
-    vehicle_length,
-    notes,
-  ]);
+  const carCoverPayload = (carCoverData.data as any[]).map(
+    ({
+      f_number,
+      vehicle_type,
+      year_generation,
+      make,
+      model,
+      submodel1,
+      submodel2,
+      submodel3,
+      submodel4,
+      concatenated,
+      size,
+      custom_size,
+      vehicle_length,
+      notes,
+    }) => [f_number, vehicle_type, year_generation, make, model, submodel1, submodel2, submodel3, submodel4, concatenated, size, custom_size, vehicle_length, notes]
+  );
 
   const timestamp = DateTime.now().setZone("America/Los_Angeles").toFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -37,7 +45,7 @@ async function updateCarCoverSizeChart(auth: any) {
     // car cover
     await sheets.spreadsheets.values.update({
       spreadsheetId: "13tu-KiJFgiz0dD5GUPB6-AR6nh8BdD2MCNMem9aClys",
-      range: "car_covers!J1",
+      range: "car_covers!O1",
       valueInputOption: "RAW",
       requestBody: {
         values: [[`Last updated: ${timestamp}`]],
@@ -45,7 +53,7 @@ async function updateCarCoverSizeChart(auth: any) {
     });
     await sheets.spreadsheets.values.clear({
       spreadsheetId: "13tu-KiJFgiz0dD5GUPB6-AR6nh8BdD2MCNMem9aClys",
-      range: "car_covers!A2:H",
+      range: "car_covers!A2:N",
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: "13tu-KiJFgiz0dD5GUPB6-AR6nh8BdD2MCNMem9aClys",
