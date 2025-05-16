@@ -4,7 +4,7 @@ import Papa from "papaparse";
 import fs from "fs";
 
 function matchLengthNotes() {
-  const lookupFile = path.resolve(__dirname, "size_chart.xlsx");
+  const lookupFile = path.resolve(__dirname, "size_chart_final.xlsx");
   const matchFile = path.resolve(__dirname, "match_notes.csv");
 
   const lookup = XLSX.readFile(lookupFile);
@@ -43,9 +43,10 @@ function matchLengthNotes() {
 
     return {
       ...row,
-      custom_size: match.custom_size,
-      vehicle_length: match.vehicle_length,
-      notes: match.notes,
+      size: match?.size || "",
+      custom_size: match?.custom_size || "",
+      vehicle_length: match?.vehicle_length || "",
+      notes: match?.notes || "",
     };
   });
 

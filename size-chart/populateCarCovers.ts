@@ -3,7 +3,7 @@ import path from "path";
 import { supabaseCoverlandSizeChart } from "../constants/constants";
 
 async function upsertCarCovers() {
-  const filePath = path.resolve(__dirname, "size_chart.xlsx");
+  const filePath = path.resolve(__dirname, "size_chart_final.xlsx");
   const workbook = XLSX.readFile(filePath);
 
   const sheetNames = ["car_cover", "suv_cover", "truck_cover"];

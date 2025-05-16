@@ -562,11 +562,11 @@ async function generateLinnWorksOrderItem(cartItem: TCartItem, taxPercentage: nu
   };
 }
 
+const LINN_WORKS_URL = "https://us-ext.linnworks.net/api";
+const LIN_WORKS_AUTH_URL = "https://api.linnworks.net/api";
+
 // Function to get component items for a full seat set
 export async function getCompositeItems(fullSetSku: string): Promise<{ frontSku: string; backSku: string } | null> {
-  const LINN_WORKS_URL = "https://us-ext.linnworks.net/api";
-  const LIN_WORKS_AUTH_URL = "https://api.linnworks.net/api";
-
   if (!fullSetSku) throw new Error("Full set SKU is required");
 
   // 1. Check in Supabase
@@ -648,3 +648,47 @@ export const calculatePreorderDiscountPercentage = (cartItem: TCartItem, preorde
 
   return discountPercentage;
 };
+
+export async function postLinnworksOrder(order: LinnWorksOrderRequest) {
+  const AUTH_TOKEN = await getAuthToken();
+
+  try {
+    const response = await fetch(`${LINN_WORKS_URL}/Orders/CreateOrders`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `${AUTH_TOKEN}`,
+      },
+      body: JSON.stringify(order),
+    });
+
+    if (!response.ok) {
+      let errorMessage = `[LinnWorks Orders POST]: Network response was not ok`;
+
+      try {
+        const errorData = await response.json(); // Try to parse JSON error response
+
+        errorMessage += `: ${JSON.stringify(errorData, null, 2)}`;
+      } catch (err) {
+        errorMessage += `: ${await response.text()}`; // Fallback to raw text if JSON parsing fails
+      }
+
+      console.error("Response:", response);
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+    console.info("[LinnWorks Orders Post] Data:", data);
+
+    return {
+      data: data,
+      status: 200,
+    };
+  } catch (error) {
+    console.error("[LinnWorks Orders POST]: An unexpected error occurred:", error);
+    return {
+      error: "[LinnWorks Orders POST]: An unexpected error occurred",
+      status: 500,
+    };
+  }
+}

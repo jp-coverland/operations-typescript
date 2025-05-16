@@ -1,5 +1,5 @@
 import path from "path";
-import { getSupabaseQuery, mapLinnWorksOrderRequest, mapOrderItemsToCartItems, readCSVOrderNumbers } from "./functions";
+import { delay, getSupabaseQuery, mapLinnWorksOrderRequest, mapOrderItemsToCartItems, postLinnworksOrder, readCSVOrderNumbers } from "./functions";
 import { Address, CustomerInfo, LinnWorksOrderRequest } from "./types";
 
 async function inputOrdersToLinnworks() {
@@ -54,9 +54,15 @@ async function inputOrdersToLinnworks() {
     );
 
     for (const orderInfo of linnworksOrderInputs) {
-      console.log(`Attempting to input order: ${JSON.stringify(orderInfo.orders, null, 2)}`);
+      for (const object of orderInfo.orders) {
+        console.info(`Attempting to input order: ${object.ReferenceNumber}`);
+      }
+      const response = await postLinnworksOrder(orderInfo);
+      console.info(response);
     }
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error with entire execution.");
+  }
 }
 
 inputOrdersToLinnworks();
