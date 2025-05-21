@@ -14,10 +14,12 @@ async function getCarCoverSizeChart() {
   return { data: data, error: null };
 }
 
-const logger = createContextLogger("size_chart_update");
+const logger = createContextLogger("car_cover_size_chart_update");
 
 async function updateCarCoverSizeChart(auth: any) {
   const sheets = google.sheets({ version: "v4", auth });
+  const timestamp = DateTime.now().setZone("America/Los_Angeles").toFormat("yyyy-MM-dd HH:mm:ss");
+  const SHEETS_ID = "13tu-KiJFgiz0dD5GUPB6-AR6nh8BdD2MCNMem9aClys";
 
   const carCoverData = await getCarCoverSizeChart();
   const carCoverPayload = (carCoverData.data as any[]).map(
@@ -39,12 +41,10 @@ async function updateCarCoverSizeChart(auth: any) {
     }) => [f_number, vehicle_type, year_generation, make, model, submodel1, submodel2, submodel3, submodel4, concatenated, size, custom_size, vehicle_length, notes]
   );
 
-  const timestamp = DateTime.now().setZone("America/Los_Angeles").toFormat("yyyy-MM-dd HH:mm:ss");
-
   try {
     // car cover
     await sheets.spreadsheets.values.update({
-      spreadsheetId: "13tu-KiJFgiz0dD5GUPB6-AR6nh8BdD2MCNMem9aClys",
+      spreadsheetId: SHEETS_ID,
       range: "car_covers!O1",
       valueInputOption: "RAW",
       requestBody: {
@@ -52,11 +52,11 @@ async function updateCarCoverSizeChart(auth: any) {
       },
     });
     await sheets.spreadsheets.values.clear({
-      spreadsheetId: "13tu-KiJFgiz0dD5GUPB6-AR6nh8BdD2MCNMem9aClys",
+      spreadsheetId: SHEETS_ID,
       range: "car_covers!A2:N",
     });
     await sheets.spreadsheets.values.update({
-      spreadsheetId: "13tu-KiJFgiz0dD5GUPB6-AR6nh8BdD2MCNMem9aClys",
+      spreadsheetId: SHEETS_ID,
       range: "car_covers!A2",
       valueInputOption: "RAW",
       requestBody: {
