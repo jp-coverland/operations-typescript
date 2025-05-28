@@ -43,7 +43,7 @@ async function updateCarCoverSizeChart(auth: any) {
     }) => [f_number, vehicle_type, year_generation, make, model, submodel1, submodel2, submodel3, submodel4, concatenated, notes, size, custom_size, vehicle_length]
   );
 
-  const groupedPayload2 = (groupedData.data as any[]).map(({ grouped_f_number, grouped_info, grouped_size, grouped_custom_size, grouped_notes }) => {
+  const groupedPayload2 = (groupedData.data as any[]).map(({ grouped_f_number, grouped_info, grouped_size, grouped_custom_size, grouped_notes, keyword }) => {
     const isFirstInGroup = grouped_f_number !== lastGroupedFNumber;
     lastGroupedFNumber = grouped_f_number;
 
@@ -53,6 +53,7 @@ async function updateCarCoverSizeChart(auth: any) {
       isFirstInGroup ? grouped_size : "",
       isFirstInGroup ? grouped_custom_size : "",
       isFirstInGroup ? grouped_notes : "",
+      isFirstInGroup ? keyword : "",
     ];
   });
 
@@ -60,7 +61,7 @@ async function updateCarCoverSizeChart(auth: any) {
     // car covers
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
-      range: "car_cover_size_chart!U1",
+      range: "car_cover_size_chart!V1",
       valueInputOption: "RAW",
       requestBody: {
         values: [[`Last updated: ${timestamp}`]],
@@ -68,7 +69,7 @@ async function updateCarCoverSizeChart(auth: any) {
     });
     await sheets.spreadsheets.values.clear({
       spreadsheetId: SHEETS_ID,
-      range: "car_cover_size_chart!A2:T",
+      range: "car_cover_size_chart!A2:U",
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,

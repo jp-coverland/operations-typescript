@@ -2,11 +2,11 @@ import * as XLSX from "xlsx";
 import path from "path";
 import { supabaseCoverlandSizeChart } from "../constants/constants";
 
-async function upsertCarCovers() {
-  const filePath = path.resolve(__dirname, "size_chart_final.xlsx");
+async function upsertNewEntries() {
+  const filePath = path.resolve(__dirname, "new_data.xlsx");
   const workbook = XLSX.readFile(filePath);
 
-  const sheetNames = ["car_cover", "suv_cover", "truck_cover"];
+  const sheetNames = ["car_cover", "seat_covers"];
 
   const productVehicles: any[] = [];
   const sizeCharts: any[] = [];
@@ -42,23 +42,25 @@ async function upsertCarCovers() {
         notes: row.notes,
       });
     }
-  }
 
-  const { error: vehicleError } = await supabaseCoverlandSizeChart.from("product_vehicle").upsert(productVehicles, { onConflict: "id" });
+    const { error: vehicleError } = await supabaseCoverlandSizeChart.from("product_vehicle").upsert(productVehicles, { onConflict: "id" });
 
-  if (vehicleError) {
-    console.error("Vehicle upsert error:", vehicleError);
-  } else {
-    console.log("Vehicle upsert complete.");
-  }
+    if (vehicleError) {
+      console.error("Product vehicle upsert error:", vehicleError);
+    } else {
+      console.log(`${sheet} product-vehicle upsert complete.`);
+    }
 
-  const { error: sizeChartError } = await supabaseCoverlandSizeChart.from("car_cover_size_chart").upsert(sizeCharts, { onConflict: "product_vehicle_id" });
+    if (sheet === "car_cover") {
+      const { error: sizeChartError } = await supabaseCoverlandSizeChart.from("car_cover_size_chart").upsert(sizeCharts, { onConflict: "product_vehicle_id" });
 
-  if (sizeChartError) {
-    console.error("Size chart upsert error:", sizeChartError);
-  } else {
-    console.log("Size chart upsert complete.");
+      if (sizeChartError) {
+        console.error("Car cover size chart upsert error:", sizeChartError);
+      } else {
+        console.log("Car cover size chart upsert complete.");
+      }
+    }
   }
 }
 
-upsertCarCovers().catch((error) => console.error("Error during upsert:", error));
+upsertNewEntries().catch((error) => console.error("Error during upsert:", error));

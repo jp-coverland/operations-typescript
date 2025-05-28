@@ -43,7 +43,7 @@ async function getContainerDatesFromSheets(auth: any) {
 
         return rowObject;
       })
-      .filter((row) => row["ETA DATE"] !== "" && new Date(row["ETA DATE"]) >= today);
+      .filter((row) => row["ETA DATE"] !== "" && new Date(row["ETA DATE"]) >= today && !row["Container"].includes("FBA"));
 
     return data;
   } catch (error) {
@@ -99,12 +99,14 @@ async function updateContainerDates() {
       const match = containerMap.get(name);
 
       if (!match) {
-        skipped.push(entry);
-        contextLogger.warn(`skipped, no container in supabase for ${name}`);
+        updates.push({
+          name: name,
+          arrived_at_warehouse: eta,
+        });
+        contextLogger.info(`New container: ${name}`);
       } else if (match.arrived_at_warehouse !== eta) {
         updates.push({
-          id: match.id,
-          name,
+          name: name,
           arrived_at_warehouse: eta,
         });
       } else {
@@ -130,7 +132,6 @@ async function updateContainerDates() {
 
 async function updateContainerDatesRun() {
   await updateContainerDates();
-  await updateEtaForSkus();
 }
 
 updateContainerDatesRun();
