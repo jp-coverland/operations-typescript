@@ -169,7 +169,7 @@ async function updateCarCoverMatrixifyChart(auth: any) {
       },
     });
 
-    logger.info("[success] seat cover matrixify size chart updated successfully.");
+    logger.info("[success] car cover matrixify size chart updated successfully.");
   } catch (error: any) {
     logger.error(`[error] Failed to update car cover matrixify size chart: ${error}`);
   }
