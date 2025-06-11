@@ -17,7 +17,7 @@ async function getMatrixifySeatCovers(start: number, end: number) {
 const logger = createContextLogger("seat_cover_matrixify_chart_update");
 
 async function updateSeatCoverMatrixifyChart(auth: any) {
-  logger.info("[start] get matrixify seat cover data...");
+  console.info("[start] get matrixify seat cover data...");
   const sheets = google.sheets({ version: "v4", auth });
   const timestamp = DateTime.now().setZone("America/Los_Angeles").toFormat("yyyy-MM-dd HH:mm:ss");
   const SHEETS_ID = "1iYW9IKmqGtm1ybeevKgghL1XoqsErYyfbXK3eH_cLfU";
@@ -28,7 +28,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
   let matrixifyPaginated: any[] = [];
 
   while (true) {
-    logger.info(`getting data from ${start} to ${start + BATCH_SIZE - 1}`);
+    console.info(`getting data from ${start} to ${start + BATCH_SIZE - 1}`);
     const { data, error } = await getMatrixifySeatCovers(start, start + BATCH_SIZE - 1);
 
     if (error) {
@@ -40,7 +40,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
     }
 
     matrixifyPaginated.push(...data);
-    logger.info(`inserting data from ${start} to ${start + BATCH_SIZE - 1}`);
+    console.info(`inserting data from ${start} to ${start + BATCH_SIZE - 1}`);
     start += BATCH_SIZE;
   }
 
@@ -176,9 +176,9 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
       },
     });
 
-    logger.info("[success] seat cover matrixify size chart updated successfully.");
+    console.info("[success] seat cover matrixify size chart updated successfully.");
   } catch (error: any) {
-    logger.error(`[error] Failed to update seat cover matrixify size chart: ${error}`);
+    console.error(`[error] Failed to update seat cover matrixify size chart: ${error}`);
   }
 }
 

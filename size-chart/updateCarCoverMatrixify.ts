@@ -17,7 +17,7 @@ async function getMatrixifyCarCovers(start: number, end: number) {
 const logger = createContextLogger("car_cover_matrixify_chart_update");
 
 async function updateCarCoverMatrixifyChart(auth: any) {
-  logger.info("[start] get matrixify car cover data...");
+  console.info("[start] get matrixify car cover data...");
   const sheets = google.sheets({ version: "v4", auth });
   const SHEETS_ID = "1iYW9IKmqGtm1ybeevKgghL1XoqsErYyfbXK3eH_cLfU";
   const sheetName = "car_cover_matrixify";
@@ -39,7 +39,7 @@ async function updateCarCoverMatrixifyChart(auth: any) {
     }
 
     matrixifyPaginated.push(...data);
-    logger.info(`inserting data from ${start} to ${start + BATCH_SIZE - 1}`);
+    console.info(`inserting data from ${start} to ${start + BATCH_SIZE - 1}`);
     start += BATCH_SIZE;
   }
 
@@ -169,9 +169,9 @@ async function updateCarCoverMatrixifyChart(auth: any) {
       },
     });
 
-    logger.info("[success] car cover matrixify size chart updated successfully.");
+    console.info("[success] car cover matrixify size chart updated successfully.");
   } catch (error: any) {
-    logger.error(`[error] Failed to update car cover matrixify size chart: ${error}`);
+    console.error(`[error] Failed to update car cover matrixify size chart: ${error}`);
   }
 }
 
