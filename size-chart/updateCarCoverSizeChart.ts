@@ -20,48 +20,70 @@ async function updateCarCoverSizeChart(auth: any) {
   const sheets = google.sheets({ version: "v4", auth });
   const timestamp = DateTime.now().setZone("America/Los_Angeles").toFormat("yyyy-MM-dd HH:mm:ss");
   const SHEETS_ID = "13tu-KiJFgiz0dD5GUPB6-AR6nh8BdD2MCNMem9aClys";
+  const sheetName = "car_cover_size_chart";
 
   const groupedData = await getCarCoverSizeChart();
   let lastGroupedFNumber: any = null;
 
   const groupedPayload1 = (groupedData.data as any[]).map(
     ({
+      id,
       f_number,
       vehicle_type,
       year_generation,
       make,
       model,
-      submodel1,
-      submodel2,
-      submodel3,
-      submodel4,
+      submodel_1,
+      submodel_2,
+      submodel_3,
+      submodel_4,
       concatenated,
       notes,
       size,
       custom_size,
       vehicle_length,
-    }) => [f_number, vehicle_type, year_generation, make, model, submodel1, submodel2, submodel3, submodel4, concatenated, notes, size, custom_size, vehicle_length]
+    }) => [
+      id,
+      f_number,
+      vehicle_type,
+      year_generation,
+      make,
+      model,
+      submodel_1,
+      submodel_2,
+      submodel_3,
+      submodel_4,
+      concatenated,
+      notes,
+      size,
+      custom_size,
+      vehicle_length,
+    ]
   );
 
-  const groupedPayload2 = (groupedData.data as any[]).map(({ grouped_f_number, grouped_info, grouped_size, grouped_custom_size, grouped_notes, keyword }) => {
-    const isFirstInGroup = grouped_f_number !== lastGroupedFNumber;
-    lastGroupedFNumber = grouped_f_number;
+  const groupedPayload2 = (groupedData.data as any[]).map(
+    ({ grouped_id, grouped_f_number, grouped_info, grouped_size, grouped_custom_size, grouped_notes, keyword }) => {
+      const isFirstInGroup = grouped_f_number !== lastGroupedFNumber;
+      lastGroupedFNumber = grouped_f_number;
 
-    return [
-      isFirstInGroup ? grouped_f_number : "",
-      isFirstInGroup ? grouped_info : "",
-      isFirstInGroup ? grouped_size : "",
-      isFirstInGroup ? grouped_custom_size : "",
-      isFirstInGroup ? grouped_notes : "",
-      isFirstInGroup ? keyword : "",
-    ];
-  });
+      // if first in group, include the actual variable data, otherwise empty string
+      return [
+        isFirstInGroup ? grouped_id : "",
+        isFirstInGroup ? grouped_f_number : "",
+        isFirstInGroup ? grouped_info : "",
+        isFirstInGroup ? grouped_size : "",
+        isFirstInGroup ? grouped_custom_size : "",
+        isFirstInGroup ? grouped_notes : "",
+        isFirstInGroup ? keyword : "",
+      ];
+    }
+  );
 
   try {
     // car covers
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
-      range: "car_cover_size_chart!V1",
+      range: `${sheetName}!W1`,
       valueInputOption: "RAW",
       requestBody: {
         values: [[`Last updated: ${timestamp}`]],
@@ -69,11 +91,11 @@ async function updateCarCoverSizeChart(auth: any) {
     });
     await sheets.spreadsheets.values.clear({
       spreadsheetId: SHEETS_ID,
-      range: "car_cover_size_chart!A2:U",
+      range: `${sheetName}!A2:Y`,
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
-      range: "car_cover_size_chart!A2",
+      range: `${sheetName}!A2`,
       valueInputOption: "RAW",
       requestBody: {
         values: groupedPayload1,
@@ -81,7 +103,7 @@ async function updateCarCoverSizeChart(auth: any) {
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
-      range: "car_cover_size_chart!P2",
+      range: `${sheetName}!Q2`,
       valueInputOption: "RAW",
       requestBody: {
         values: groupedPayload2,
@@ -93,4 +115,5 @@ async function updateCarCoverSizeChart(auth: any) {
     logger.error(`[error] Failed to update car cover size chart: ${error}`);
   }
 }
+
 authorize().then(updateCarCoverSizeChart).catch(console.error);
