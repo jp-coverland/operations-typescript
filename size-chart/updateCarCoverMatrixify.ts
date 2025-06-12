@@ -27,7 +27,7 @@ async function updateCarCoverMatrixifyChart(auth: any) {
   let matrixifyPaginated: any[] = [];
 
   while (true) {
-    logger.info(`getting data from ${start} to ${start + BATCH_SIZE - 1}`);
+    console.info(`getting data from ${start} to ${start + BATCH_SIZE - 1}`);
     const { data, error } = await getMatrixifyCarCovers(start, start + BATCH_SIZE - 1);
 
     if (error) {
