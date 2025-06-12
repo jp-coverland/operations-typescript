@@ -83,7 +83,7 @@ async function updateCarCoverSizeChart(auth: any) {
     // car covers
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!W1`,
+      range: `${sheetName}!X1`,
       valueInputOption: "RAW",
       requestBody: {
         values: [[`Last updated: ${timestamp}`]],
@@ -110,9 +110,9 @@ async function updateCarCoverSizeChart(auth: any) {
       },
     });
 
-    logger.info("[success] car cover size chart updated successfully.");
+    console.info("[success] car cover size chart updated successfully.");
   } catch (error: any) {
-    logger.error(`[error] Failed to update car cover size chart: ${error}`);
+    console.error(`[error] Failed to update car cover size chart: ${error}`);
   }
 }
 

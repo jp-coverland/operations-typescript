@@ -72,6 +72,18 @@ async function updateSeatCoverSizeChart(auth: any) {
   try {
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
+      range: `${sheetName}!V1`,
+      valueInputOption: "RAW",
+      requestBody: {
+        values: [[`Last updated: ${timestamp}`]],
+      },
+    });
+    await sheets.spreadsheets.values.clear({
+      spreadsheetId: SHEETS_ID,
+      range: `${sheetName}!A2:U`,
+    });
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: SHEETS_ID,
       range: `${sheetName}!A2`,
       valueInputOption: "RAW",
       requestBody: {
