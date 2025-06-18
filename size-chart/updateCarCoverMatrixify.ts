@@ -160,6 +160,10 @@ async function updateCarCoverMatrixifyChart(auth: any) {
   );
 
   try {
+    await sheets.spreadsheets.values.clear({
+      spreadsheetId: SHEETS_ID,
+      range: `${sheetName}!A2:BG`,
+    });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
       range: `${sheetName}!A2`,

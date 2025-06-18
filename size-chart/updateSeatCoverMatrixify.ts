@@ -165,7 +165,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
   try {
     await sheets.spreadsheets.values.clear({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!A2:BD`,
+      range: `${sheetName}!A2:BH`,
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,

@@ -7,7 +7,7 @@ import { logger } from "../constants/logger";
 
 dotenv.config();
 
-async function getLinnworksInventory(entriesPerPage: number, pageNumber: number, locationID: any, excludeComposites: boolean, authorization: string) {
+export async function getLinnworksInventory(entriesPerPage: number, pageNumber: number, locationID: any, excludeComposites: boolean, authorization: string) {
   try {
     await trackApiCall();
 
