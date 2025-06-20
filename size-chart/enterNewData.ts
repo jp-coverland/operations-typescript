@@ -58,6 +58,7 @@ async function upsertNewEntries() {
           front_seat_size: row.front_seat_size,
           rear_seat_size: row.rear_seat_size,
           third_seat_size: row.third_seat_size,
+          google_drive_image_url: row.google_drive_image_url,
         });
       } else if (sheet === "floor_mats") {
         floorMatSizeChart.push({
