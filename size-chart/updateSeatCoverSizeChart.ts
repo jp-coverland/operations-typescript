@@ -44,6 +44,7 @@ async function updateSeatCoverSizeChart(auth: any) {
       rear_seat_size,
       third_seat_size,
       google_drive_image_url,
+      direct_link,
     }) => [
       id,
       f_number,
@@ -66,13 +67,14 @@ async function updateSeatCoverSizeChart(auth: any) {
       rear_seat_size,
       third_seat_size,
       google_drive_image_url,
+      direct_link,
     ]
   );
 
   try {
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!V1`,
+      range: `${sheetName}!W1`,
       valueInputOption: "RAW",
       requestBody: {
         values: [[`Last updated: ${timestamp}`]],
@@ -80,7 +82,7 @@ async function updateSeatCoverSizeChart(auth: any) {
     });
     await sheets.spreadsheets.values.clear({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!A2:U`,
+      range: `${sheetName}!A2:V`,
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
