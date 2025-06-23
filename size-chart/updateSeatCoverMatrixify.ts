@@ -178,7 +178,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
 
     console.info("[success] seat cover matrixify size chart updated successfully.");
   } catch (error: any) {
-    console.error(`[error] Failed to update seat cover matrixify size chart: ${error}`);
+    console.error(`[error] failed to update seat cover matrixify size chart: ${error}`);
   }
 }
 

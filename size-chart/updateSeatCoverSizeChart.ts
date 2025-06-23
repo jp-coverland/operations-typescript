@@ -92,9 +92,9 @@ async function updateSeatCoverSizeChart(auth: any) {
         values: payload,
       },
     });
-    console.info("[success] car cover size chart updated successfully.");
+    console.info("[success] seat cover size chart updated successfully.");
   } catch (error: any) {
-    console.error(`[error] Failed to update car cover size chart: ${error}`);
+    console.error(`[error] failed to update car cover size chart: ${error}`);
   }
 }
 
