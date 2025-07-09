@@ -167,6 +167,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
         variant_fulfillment_service,
         variant_inventory_qty,
         master_sku,
+        master_sku?.includes("NEW") ? false : true,
         product_video_360,
         product_video_zoom,
         product_video_carousel,
