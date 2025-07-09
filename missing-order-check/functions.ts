@@ -601,10 +601,27 @@ export async function getCompositeItems(fullSetSku: string): Promise<{ frontSku:
   if (!compositionsResponse.ok) throw new Error(`Failed to fetch compositions: ${compositionsResponse.statusText}`);
   const compositions = await compositionsResponse.json();
 
-  const frontComponent = compositions.find((c: any) => c.SKU.includes("-F-"));
-  const backComponent = compositions.find((c: any) => c.SKU.includes("-B-"));
+  // check how many f's, if 2 f's find first f-## sku, which would be front, second f-## sku would be back
+  const frontCount = compositions.filter((c: any) => c.SKU.includes("-F-")).reduce((total: number, c: any) => total + (c.Quantity || 0), 0);
+
+  let frontComponent;
+  let backComponent;
+
+  if (frontCount == 2) {
+    const frontMatches = [...fullSetSku.matchAll(/F-\d+/g)].map((m) => m[0]); // ['first front', 'second front']
+
+    const firstFrontSku = frontMatches[0];
+    const secondFrontSku = frontMatches[1];
+
+    frontComponent = compositions.find((c: any) => c.SKU.includes(firstFrontSku));
+    backComponent = compositions.find((c: any) => c.SKU.includes(secondFrontSku));
+  } else {
+    frontComponent = compositions.find((c: any) => c.SKU.includes("-F-"));
+    backComponent = compositions.find((c: any) => c.SKU.includes("-B-"));
+  }
+
   if (!frontComponent || !backComponent)
-    throw new Error(`Front or back component not found:\n full: ${fullSetSku} foundFrount: ${!!frontComponent} foundBack: ${!!backComponent}`);
+    throw new Error(`Front or back component not found:\n full: ${fullSetSku} foundFront: ${!!frontComponent} foundBack: ${!!backComponent}`);
 
   // Save to database for future use
   try {

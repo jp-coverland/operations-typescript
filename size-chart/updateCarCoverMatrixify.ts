@@ -17,7 +17,7 @@ async function getMatrixifyCarCovers(start: number, end: number) {
 const logger = createContextLogger("car_cover_matrixify_chart_update");
 
 async function updateCarCoverMatrixifyChart(auth: any) {
-  console.info("[start] get matrixify car cover data...");
+  logger.info("[start] get matrixify car cover data...");
   const sheets = google.sheets({ version: "v4", auth });
   const SHEETS_ID = "1iYW9IKmqGtm1ybeevKgghL1XoqsErYyfbXK3eH_cLfU";
   const sheetName = "car_cover_matrixify";
@@ -27,7 +27,7 @@ async function updateCarCoverMatrixifyChart(auth: any) {
   let matrixifyPaginated: any[] = [];
 
   while (true) {
-    console.info(`getting data from ${start} to ${start + BATCH_SIZE - 1}`);
+    logger.info(`getting data from ${start} to ${start + BATCH_SIZE - 1}`);
     const { data, error } = await getMatrixifyCarCovers(start, start + BATCH_SIZE - 1);
 
     if (error) {
@@ -39,7 +39,7 @@ async function updateCarCoverMatrixifyChart(auth: any) {
     }
 
     matrixifyPaginated.push(...data);
-    console.info(`inserting data from ${start} to ${start + BATCH_SIZE - 1}`);
+    logger.info(`inserting data from ${start} to ${start + BATCH_SIZE - 1}`);
     start += BATCH_SIZE;
   }
 
@@ -100,6 +100,10 @@ async function updateCarCoverMatrixifyChart(auth: any) {
       variant_fulfillment_service,
       variant_inventory_qty,
       master_sku,
+      product_video_360,
+      product_video_zoom,
+      product_video_carousel,
+      product_video_carousel_thumbnail,
     }) => [
       id,
       product_vehicle_id,
@@ -156,6 +160,10 @@ async function updateCarCoverMatrixifyChart(auth: any) {
       variant_fulfillment_service,
       variant_inventory_qty,
       master_sku,
+      product_video_360,
+      product_video_zoom,
+      product_video_carousel,
+      product_video_carousel_thumbnail,
     ]
   );
 
@@ -173,9 +181,9 @@ async function updateCarCoverMatrixifyChart(auth: any) {
       },
     });
 
-    console.info("[success] car cover matrixify size chart updated successfully.");
+    logger.info("[success] car cover matrixify size chart updated successfully.");
   } catch (error: any) {
-    console.error(`[error] Failed to update car cover matrixify size chart: ${error}`);
+    logger.error(`[error] Failed to update car cover matrixify size chart: ${error}`);
   }
 }
 
