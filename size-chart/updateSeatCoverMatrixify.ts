@@ -178,7 +178,9 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
 
   const minimalColorColumns: any[][] = [];
   for (const color of minimalColors) {
-    const minimalRows = matrixifyPaginated.filter((row) => row.color_code === color).map(({ variant_sku, variant_barcode }) => [variant_sku, variant_barcode]);
+    const minimalRows = matrixifyPaginated
+      .filter((row) => row.color_code === color)
+      .map(({ id, variant_sku, variant_barcode }) => [id, variant_sku, variant_barcode]);
     minimalColorColumns.push(minimalRows);
   }
 
@@ -195,7 +197,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
   try {
     await sheets.spreadsheets.values.clear({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!A2:BZ`,
+      range: `${sheetName}!A2:CI`,
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
