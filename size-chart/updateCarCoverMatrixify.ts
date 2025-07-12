@@ -104,6 +104,7 @@ async function updateCarCoverMatrixifyChart(auth: any) {
       product_video_zoom,
       product_video_carousel,
       product_video_carousel_thumbnail,
+      website_true,
     }) => [
       id,
       product_vehicle_id,
@@ -164,13 +165,14 @@ async function updateCarCoverMatrixifyChart(auth: any) {
       product_video_zoom,
       product_video_carousel,
       product_video_carousel_thumbnail,
+      website_true,
     ]
   );
 
   try {
     await sheets.spreadsheets.values.clear({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!A2:BG`,
+      range: `${sheetName}!A2:BH`,
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
