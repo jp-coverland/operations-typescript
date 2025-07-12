@@ -110,6 +110,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
         product_video_zoom,
         product_video_carousel,
         product_video_carousel_thumbnail,
+        website_true,
       }) => [
         id,
         product_vehicle_id,
@@ -167,11 +168,11 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
         variant_fulfillment_service,
         variant_inventory_qty,
         master_sku,
-        master_sku?.includes("NEW") ? false : true,
         product_video_360,
         product_video_zoom,
         product_video_carousel,
         product_video_carousel_thumbnail,
+        website_true,
       ]
     );
   // const minimalBeigePayload = matrixifyPaginated.filter((row) => row.color_code === "BE").map(({ variant_sku, variant_barcode }) => [variant_sku, variant_barcode]);
@@ -198,7 +199,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
   try {
     await sheets.spreadsheets.values.clear({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!A2:CI`,
+      range: `${sheetName}!A2:CJ`,
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,

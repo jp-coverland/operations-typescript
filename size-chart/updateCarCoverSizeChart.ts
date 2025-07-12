@@ -22,6 +22,7 @@ async function updateCarCoverSizeChart(auth: any) {
   const SHEETS_ID = "13tu-KiJFgiz0dD5GUPB6-AR6nh8BdD2MCNMem9aClys";
   const sheetName = "car_cover_size_chart";
 
+  console.info("Retrieving car cover size chart data...");
   const groupedData = await getCarCoverSizeChart();
   let lastGroupedFNumber: any = null;
 
@@ -80,6 +81,7 @@ async function updateCarCoverSizeChart(auth: any) {
   );
 
   try {
+    console.info("Uploading size info to google sheets...");
     // car covers
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
