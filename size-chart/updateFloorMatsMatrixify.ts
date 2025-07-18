@@ -202,9 +202,9 @@ async function updateFloorMatsMatrixifyChart(auth: any) {
       },
     });
 
-    logger.info("[success] car cover matrixify size chart updated successfully.");
+    logger.info("[success] floor mats matrixify size chart updated successfully.");
   } catch (error: any) {
-    logger.error(`[error] Failed to update car cover matrixify size chart: ${error}`);
+    logger.error(`[error] Failed to update floor mats matrixify size chart: ${error}`);
   }
 }
 
