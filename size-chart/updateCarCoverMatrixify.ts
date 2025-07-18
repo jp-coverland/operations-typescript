@@ -1,7 +1,7 @@
 import { google } from "googleapis";
 import { supabaseCoverlandSizeChart } from "../constants/constants";
 import { DateTime } from "luxon";
-import { createContextLogger } from "../constants/logger";
+import { logger } from "../constants/logger";
 import { authorize } from "../google-sheets/authClient";
 
 async function getMatrixifyCarCovers(start: number, end: number) {
@@ -14,11 +14,10 @@ async function getMatrixifyCarCovers(start: number, end: number) {
   return { data: data, error: null };
 }
 
-const logger = createContextLogger("car_cover_matrixify_chart_update");
-
 async function updateCarCoverMatrixifyChart(auth: any) {
   logger.info("[start] get matrixify car cover data...");
   const sheets = google.sheets({ version: "v4", auth });
+  const timestamp = DateTime.now().setZone("America/Los_Angeles").toFormat("yyyy-MM-dd HH:mm:ss");
   const SHEETS_ID = "1iYW9IKmqGtm1ybeevKgghL1XoqsErYyfbXK3eH_cLfU";
   const sheetName = "car_cover_matrixify";
 
@@ -43,7 +42,7 @@ async function updateCarCoverMatrixifyChart(auth: any) {
     start += BATCH_SIZE;
   }
 
-  const matrixifyPaylod = (matrixifyPaginated as any[]).map(
+  const matrixifyPayload = (matrixifyPaginated as any[]).map(
     ({
       id,
       product_vehicle_id,
@@ -168,18 +167,25 @@ async function updateCarCoverMatrixifyChart(auth: any) {
       website_true,
     ]
   );
-
   try {
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: SHEETS_ID,
+      range: `${sheetName}!A1`,
+      valueInputOption: "RAW",
+      requestBody: {
+        values: [[`Last updated: ${timestamp}`]],
+      },
+    });
     await sheets.spreadsheets.values.clear({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!A2:BH`,
+      range: `${sheetName}!A3:BH`,
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!A2`,
+      range: `${sheetName}!A3`,
       valueInputOption: "RAW",
       requestBody: {
-        values: matrixifyPaylod,
+        values: matrixifyPayload,
       },
     });
 

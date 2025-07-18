@@ -1,7 +1,7 @@
 import { google } from "googleapis";
 import { supabaseCoverlandSizeChart } from "../constants/constants";
 import { DateTime } from "luxon";
-import { createContextLogger } from "../constants/logger";
+import { logger } from "../constants/logger";
 import { authorize } from "../google-sheets/authClient";
 
 async function getCarCoverSizeChart() {
@@ -14,15 +14,13 @@ async function getCarCoverSizeChart() {
   return { data: data, error: null };
 }
 
-const logger = createContextLogger("car_cover_size_chart_update");
-
 async function updateCarCoverSizeChart(auth: any) {
   const sheets = google.sheets({ version: "v4", auth });
   const timestamp = DateTime.now().setZone("America/Los_Angeles").toFormat("yyyy-MM-dd HH:mm:ss");
   const SHEETS_ID = "13tu-KiJFgiz0dD5GUPB6-AR6nh8BdD2MCNMem9aClys";
   const sheetName = "car_cover_size_chart";
 
-  console.info("Retrieving car cover size chart data...");
+  logger.info("Retrieving car cover size chart data...");
   const groupedData = await getCarCoverSizeChart();
   let lastGroupedFNumber: any = null;
 
@@ -81,7 +79,7 @@ async function updateCarCoverSizeChart(auth: any) {
   );
 
   try {
-    console.info("Uploading size info to google sheets...");
+    logger.info("Uploading size info to google sheets...");
     // car covers
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
@@ -112,9 +110,9 @@ async function updateCarCoverSizeChart(auth: any) {
       },
     });
 
-    console.info("[success] car cover size chart updated successfully.");
+    logger.info("[success] car cover size chart updated successfully.");
   } catch (error: any) {
-    console.error(`[error] Failed to update car cover size chart: ${error}`);
+    logger.error(`[error] Failed to update car cover size chart: ${error}`);
   }
 }
 
