@@ -20,6 +20,7 @@ async function updateSeatCoverSizeChart(auth: any) {
   const SHEETS_ID = "13tu-KiJFgiz0dD5GUPB6-AR6nh8BdD2MCNMem9aClys";
   const sheetName = "seat_cover_size_chart";
 
+  console.info("Retrieving seat cover size chart data...");
   const seatCoverSizeChartData = await getSeatCoverSizeChart();
   const payload = (seatCoverSizeChartData.data as any[]).map(
     ({
@@ -72,6 +73,8 @@ async function updateSeatCoverSizeChart(auth: any) {
   );
 
   try {
+    console.info("Uploading size info to google sheets...");
+
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
       range: `${sheetName}!W1`,
