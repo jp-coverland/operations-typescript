@@ -1,7 +1,7 @@
 import { google } from "googleapis";
 import { supabaseCoverlandSizeChart } from "../constants/constants";
 import { DateTime } from "luxon";
-import { createContextLogger } from "../constants/logger";
+import { logger } from "../constants/logger";
 import { authorize } from "../google-sheets/authClient";
 
 async function getSeatCoverSizeChart() {
@@ -17,10 +17,10 @@ async function getSeatCoverSizeChart() {
 async function updateSeatCoverSizeChart(auth: any) {
   const sheets = google.sheets({ version: "v4", auth });
   const timestamp = DateTime.now().setZone("America/Los_Angeles").toFormat("yyyy-MM-dd HH:mm:ss");
-  const SHEETS_ID = "13tu-KiJFgiz0dD5GUPB6-AR6nh8BdD2MCNMem9aClys";
+  const SHEETS_ID = "1FmYf8w2CdUqYDPgpeHZEBh7UujLwtmyWD_wfXxB5pQk";
   const sheetName = "seat_cover_size_chart";
 
-  console.info("Retrieving seat cover size chart data...");
+  logger.info("Retrieving seat cover size chart data...");
   const seatCoverSizeChartData = await getSeatCoverSizeChart();
   const payload = (seatCoverSizeChartData.data as any[]).map(
     ({
@@ -73,7 +73,7 @@ async function updateSeatCoverSizeChart(auth: any) {
   );
 
   try {
-    console.info("Uploading size info to google sheets...");
+    logger.info("Uploading size info to google sheets...");
 
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
@@ -95,9 +95,9 @@ async function updateSeatCoverSizeChart(auth: any) {
         values: payload,
       },
     });
-    console.info("[success] seat cover size chart updated successfully.");
+    logger.info("[success] seat cover size chart updated successfully.");
   } catch (error: any) {
-    console.error(`[error] failed to update car cover size chart: ${error}`);
+    logger.error(`[error] failed to update seat cover size chart: ${error}`);
   }
 }
 
