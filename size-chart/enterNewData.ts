@@ -77,7 +77,7 @@ async function upsertNewEntries() {
     const { error: vehicleError } = await supabaseCoverlandSizeChart.from("product_vehicle").upsert(productVehicles, { onConflict: "id" });
 
     if (vehicleError) {
-      console.error("Product vehicle upsert error:", vehicleError);
+      console.error(`${sheet} product vehicle upsert error:`, vehicleError);
     } else {
       console.log(`${sheet} product-vehicle upsert complete.`);
     }
