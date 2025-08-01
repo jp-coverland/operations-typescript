@@ -9,11 +9,11 @@ async function getIndividualSkus() {
   });
 
   const output = result.data.map((row) => {
-    const matches = row.ItemNumber.match(/F-([A-Z0-9]+)-(F|B)-([A-Z0-9]+)/);
+    const matches = row.composite_sku.match(/F-([A-Z0-9]+)-(F|B|R)-([A-Z0-9]+)/);
     if (!matches) return { ...row, component_1: null, component_2: null };
 
     const [_, frontSize, frontOrBack, rearSize] = matches;
-    const parts = row.ItemNumber.split("-");
+    const parts = row.composite_sku.split("-");
 
     const prefix = parts.slice(0, 3).join("-"); // e.g. CA-SC-10
     const color = parts.slice(7).join("-"); // e.g. BK-1TO
