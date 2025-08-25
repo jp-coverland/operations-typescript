@@ -105,6 +105,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
       product_video_carousel,
       product_video_carousel_thumbnail,
       website_true,
+      can_delete,
     }) => [
       id,
       product_vehicle_id,
@@ -167,6 +168,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
       product_video_carousel,
       product_video_carousel_thumbnail,
       website_true,
+      can_delete,
     ]
   );
 
@@ -181,7 +183,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
     });
     await sheets.spreadsheets.values.clear({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!A3:BI`,
+      range: `${sheetName}!A3:BJ`,
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
