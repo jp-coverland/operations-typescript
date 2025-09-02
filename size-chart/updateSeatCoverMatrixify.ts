@@ -87,6 +87,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
       variant_generate_from_options,
       variant_sku,
       variant_barcode,
+      variant_hash,
       variant_weight,
       variant_weight_unit,
       variant_price,
@@ -104,6 +105,9 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
       product_video_zoom,
       product_video_carousel,
       product_video_carousel_thumbnail,
+      front_seat_type,
+      rear_seat_type,
+      third_seat_type,
       website_true,
       can_delete,
     }) => [
@@ -150,6 +154,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
       variant_generate_from_options,
       variant_sku,
       variant_barcode,
+      variant_hash,
       variant_weight,
       variant_weight_unit,
       variant_price,
@@ -167,6 +172,9 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
       product_video_zoom,
       product_video_carousel,
       product_video_carousel_thumbnail,
+      front_seat_type,
+      rear_seat_type,
+      third_seat_type,
       website_true,
       can_delete,
     ]
@@ -183,7 +191,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
     });
     await sheets.spreadsheets.values.clear({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!A3:BJ`,
+      range: `${sheetName}!A3:BN`,
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
