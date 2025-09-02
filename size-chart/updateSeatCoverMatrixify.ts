@@ -101,10 +101,6 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
       variant_fulfillment_service,
       variant_inventory_qty,
       master_sku,
-      product_video_360,
-      product_video_zoom,
-      product_video_carousel,
-      product_video_carousel_thumbnail,
       front_seat_type,
       rear_seat_type,
       third_seat_type,
@@ -168,10 +164,6 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
       variant_fulfillment_service,
       variant_inventory_qty,
       master_sku,
-      product_video_360,
-      product_video_zoom,
-      product_video_carousel,
-      product_video_carousel_thumbnail,
       front_seat_type,
       rear_seat_type,
       third_seat_type,
@@ -191,7 +183,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
     });
     await sheets.spreadsheets.values.clear({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!A3:BN`,
+      range: `${sheetName}!A3:BJ`,
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
