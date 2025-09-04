@@ -42,9 +42,9 @@ async function updateCarCoverSizeChart(auth: any) {
       custom_size,
       vehicle_length,
     }) => [
+      vehicle_type,
       id,
       f_number,
-      vehicle_type,
       year_generation,
       make,
       model,
@@ -91,11 +91,11 @@ async function updateCarCoverSizeChart(auth: any) {
     });
     await sheets.spreadsheets.values.clear({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!A2:Y`,
+      range: `${sheetName}!A3:W`,
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!A2`,
+      range: `${sheetName}!A3`,
       valueInputOption: "RAW",
       requestBody: {
         values: groupedPayload1,
@@ -103,7 +103,7 @@ async function updateCarCoverSizeChart(auth: any) {
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!Q2`,
+      range: `${sheetName}!Q3`,
       valueInputOption: "RAW",
       requestBody: {
         values: groupedPayload2,
