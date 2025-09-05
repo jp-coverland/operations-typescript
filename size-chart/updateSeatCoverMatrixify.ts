@@ -21,6 +21,9 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
   const SHEETS_ID = "1fB5L3TWp1isLUAKR8eB87P2c7Duc-2yqw9b_eAusQto";
   const sheetName = "seat_cover_matrixify";
 
+  const IMAGES_SHEETS_ID = "1Ozetk_rtoiDAXI9Ezar3qqHIKcMaDg-cAWmPSZGZ3Mw";
+  const imageSheetName = "images";
+
   const BATCH_SIZE = 15000;
   let start = 0;
   let matrixifyPaginated: any[] = [];
@@ -172,6 +175,8 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
     ]
   );
 
+  const imagesPayload = (matrixifyPaginated as any[]).map(({ id, image_src, variant_image }) => [id, image_src, variant_image]);
+
   try {
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
@@ -197,6 +202,32 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
     logger.info("[success] seat cover matrixify size chart updated successfully.");
   } catch (error: any) {
     logger.error(`[error] failed to update seat cover matrixify size chart: ${error}`);
+  }
+
+  try {
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: IMAGES_SHEETS_ID,
+      range: `${imageSheetName}!D1`,
+      valueInputOption: "RAW",
+      requestBody: {
+        values: [[`Last updated: ${timestamp}`]],
+      },
+    });
+    await sheets.spreadsheets.values.clear({
+      spreadsheetId: IMAGES_SHEETS_ID,
+      range: `${imageSheetName}!A2:C`,
+    });
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: IMAGES_SHEETS_ID,
+      range: `${imageSheetName}!A2`,
+      valueInputOption: "RAW",
+      requestBody: {
+        values: imagesPayload,
+      },
+    });
+    logger.info("[success] seat cover images chart updated successfully.");
+  } catch (error: any) {
+    logger.error(`[error] failed to update seat cover images chart: ${error}`);
   }
 }
 
