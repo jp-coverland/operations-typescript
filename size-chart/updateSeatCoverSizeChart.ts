@@ -36,11 +36,8 @@ async function updateSeatCoverSizeChart(auth: any) {
       submodel_4,
       concatenated,
       front_seat_type,
-      front_size_code,
       rear_seat_type,
-      rear_size_code,
       third_seat_type,
-      third_size_code,
       front_seat_size,
       rear_seat_size,
       third_seat_size,
@@ -59,11 +56,8 @@ async function updateSeatCoverSizeChart(auth: any) {
       submodel_4,
       concatenated,
       front_seat_type,
-      front_size_code,
       rear_seat_type,
-      rear_size_code,
       third_seat_type,
-      third_size_code,
       front_seat_size,
       rear_seat_size,
       third_seat_size,
@@ -77,7 +71,7 @@ async function updateSeatCoverSizeChart(auth: any) {
 
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!W1`,
+      range: `${sheetName}!T1`,
       valueInputOption: "RAW",
       requestBody: {
         values: [[`Last updated: ${timestamp}`]],
@@ -85,7 +79,7 @@ async function updateSeatCoverSizeChart(auth: any) {
     });
     await sheets.spreadsheets.values.clear({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!A2:V`,
+      range: `${sheetName}!A2:T`,
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
