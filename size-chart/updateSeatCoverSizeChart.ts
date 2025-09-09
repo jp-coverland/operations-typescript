@@ -22,56 +22,88 @@ async function updateSeatCoverSizeChart(auth: any) {
 
   logger.info("Retrieving seat cover size chart data...");
   const seatCoverSizeChartData = await getSeatCoverSizeChart();
-  const payload = (seatCoverSizeChartData.data as any[]).map(
-    ({
-      id,
-      f_number,
-      vehicle_type,
-      year_generation,
-      make,
-      model,
-      submodel_1,
-      submodel_2,
-      submodel_3,
-      submodel_4,
-      concatenated,
-      front_seat_type,
-      rear_seat_type,
-      third_seat_type,
-      front_seat_size,
-      rear_seat_size,
-      third_seat_size,
-      google_drive_image_url,
-      direct_link,
-    }) => [
-      id,
-      f_number,
-      vehicle_type,
-      year_generation,
-      make,
-      model,
-      submodel_1,
-      submodel_2,
-      submodel_3,
-      submodel_4,
-      concatenated,
-      front_seat_type,
-      rear_seat_type,
-      third_seat_type,
-      front_seat_size,
-      rear_seat_size,
-      third_seat_size,
-      google_drive_image_url,
-      direct_link,
-    ]
-  );
+
+  const headers = [
+    "vehicle_type",
+    "id",
+    "f_number",
+    "year_generation",
+    "make",
+    "model",
+    "submodel_1_label",
+    "submodel_1",
+    "submodel_2_label",
+    "submodel_2",
+    "submodel_3_label",
+    "submodel_3",
+    "concatenated",
+    "front_seat_type",
+    "rear_seat_type",
+    "third_seat_type",
+    "front_seat_size",
+    "rear_seat_size",
+    "third_seat_size",
+    "google_drive_image_url",
+    "direct_link",
+  ];
+
+  const payload = [
+    headers,
+    ...(seatCoverSizeChartData.data as any[]).map(
+      ({
+        id,
+        f_number,
+        vehicle_type,
+        year_generation,
+        make,
+        model,
+        submodel_1_label,
+        submodel_1,
+        submodel_2_label,
+        submodel_2,
+        submodel_3_label,
+        submodel_3,
+        concatenated,
+        front_seat_type,
+        rear_seat_type,
+        third_seat_type,
+        front_seat_size,
+        rear_seat_size,
+        third_seat_size,
+        google_drive_image_url,
+        direct_link,
+      }) => [
+        vehicle_type,
+        id,
+        f_number,
+        year_generation,
+        make,
+        model,
+        submodel_1_label,
+        submodel_1,
+        submodel_2_label,
+        submodel_2,
+        submodel_3_label,
+        submodel_3,
+        concatenated,
+        front_seat_type,
+        rear_seat_type,
+        third_seat_type,
+        front_seat_size,
+        rear_seat_size,
+        third_seat_size,
+        google_drive_image_url,
+        direct_link,
+      ]
+    ),
+  ];
 
   try {
     logger.info("Uploading size info to google sheets...");
 
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!T1`,
+      range: `${sheetName}!E1`,
       valueInputOption: "RAW",
       requestBody: {
         values: [[`Last updated: ${timestamp}`]],
@@ -79,7 +111,7 @@ async function updateSeatCoverSizeChart(auth: any) {
     });
     await sheets.spreadsheets.values.clear({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!A2:T`,
+      range: `${sheetName}!A2:V`,
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
