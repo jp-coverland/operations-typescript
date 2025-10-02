@@ -6,7 +6,7 @@ const NEXT_PUBLIC_SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const NEXT_PUBLIC_SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!NEXT_PUBLIC_SUPABASE_URL || !NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-  throw new Error("Missing Supabase environment variables");
+  throw new Error("Missing Supabase environment variables: admin_panel_node");
 }
 
 export const supabase = createClient(NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY);
@@ -15,12 +15,25 @@ const NEXT_PUBLIC_SUPABASE_COVERLAND_DB_URL = process.env.NEXT_PUBLIC_SUPABASE_C
 const NEXT_PUBLIC_SUPABASE_COVERLAND_DB_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_COVERLAND_DB_ANON_KEY;
 
 if (!NEXT_PUBLIC_SUPABASE_COVERLAND_DB_URL || !NEXT_PUBLIC_SUPABASE_COVERLAND_DB_ANON_KEY) {
-  throw new Error("Missing Supabase environment variables");
+  throw new Error("Missing Supabase environment variables: coverland_db");
 }
 
 export const supabaseCoverlandDB = createClient(NEXT_PUBLIC_SUPABASE_COVERLAND_DB_URL, NEXT_PUBLIC_SUPABASE_COVERLAND_DB_ANON_KEY);
 
 export const supabaseCoverlandSizeChart = createClient(NEXT_PUBLIC_SUPABASE_COVERLAND_DB_URL, NEXT_PUBLIC_SUPABASE_COVERLAND_DB_ANON_KEY, {
+  db: { schema: "size_chart" },
+});
+
+const NEXT_PUBLIC_SUPABASE_COVERLAND_DB_STAGING_URL = process.env.NEXT_PUBLIC_SUPABASE_COVERLAND_DB_STAGING_URL;
+const NEXT_PUBLIC_SUPABASE_COVERLAND_DB__STAGING_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_COVERLAND_DB__STAGING_ANON_KEY;
+
+if (!NEXT_PUBLIC_SUPABASE_COVERLAND_DB_STAGING_URL || !NEXT_PUBLIC_SUPABASE_COVERLAND_DB__STAGING_ANON_KEY) {
+  throw new Error("Missing Supabase environment variables: coverland_db_staging");
+}
+
+export const supabaseCoverlandDbStaging = createClient(NEXT_PUBLIC_SUPABASE_COVERLAND_DB_STAGING_URL, NEXT_PUBLIC_SUPABASE_COVERLAND_DB__STAGING_ANON_KEY);
+
+export const supabaseCoverlandDbStagingSizeChart = createClient(NEXT_PUBLIC_SUPABASE_COVERLAND_DB_STAGING_URL, NEXT_PUBLIC_SUPABASE_COVERLAND_DB__STAGING_ANON_KEY, {
   db: { schema: "size_chart" },
 });
 
