@@ -1,6 +1,6 @@
 import * as XLSX from "xlsx";
 import path from "path";
-import { supabaseCoverlandSizeChart } from "../constants/constants";
+import { supabaseCoverlandSizeChart, supabaseCoverlandDbStagingSizeChart } from "../constants/constants";
 
 async function upsertNewEntries() {
   const filePath = path.resolve(__dirname, "new_data.xlsx");
