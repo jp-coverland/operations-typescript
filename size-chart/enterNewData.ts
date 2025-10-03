@@ -30,6 +30,7 @@ async function upsertNewEntries() {
         year_generation: row.year_generation,
         make: row.make,
         model: row.model,
+        model_2: row.model_2,
         submodel_1_label: row.submodel_1_label,
         submodel_1: row.submodel_1,
         submodel_2_label: row.submodel_2_label,
