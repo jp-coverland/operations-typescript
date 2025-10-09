@@ -68,7 +68,7 @@ async function produceMetaObjectMatrixify() {
 
   const matrixifyRows = prepareMetaobjectMatrixify(filtered);
   const outputCSV = Papa.unparse(matrixifyRows);
-  const outputPath = path.resolve(__dirname, "floor_mats_variation_images.csv");
+  const outputPath = path.resolve(__dirname, "metaobject_floor_mats_variation_images.csv");
   fs.writeFileSync(outputPath, outputCSV, "utf-8");
 
   console.info("[end] produced matrixify csv file");
