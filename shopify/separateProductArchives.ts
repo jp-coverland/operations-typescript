@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import Papa from "papaparse";
-import { shopifyClient } from "./client";
+import { shopifyStagingClient } from "./client";
 import { HANDLE_QUERY } from "./graphQL";
 
 async function getHandlesFromCSV() {
@@ -17,7 +17,7 @@ async function getHandlesFromCSV() {
 }
 
 async function getProductDataByHandle(handle: string) {
-  const { data, errors } = await shopifyClient.request(HANDLE_QUERY, {
+  const { data, errors } = await shopifyStagingClient.request(HANDLE_QUERY, {
     variables: {
       handle: handle,
     },
@@ -42,6 +42,8 @@ async function separateProductArchives() {
         ID: "HANDLE NOT FOUND",
         Status: "NOT FOUND",
         Command: "NOT FOUND",
+        supabase_row_count: "n/a",
+        shopify_variant_count: "n/a",
       });
     } else {
       const gid = productData.productByHandle.id;
@@ -57,6 +59,8 @@ async function separateProductArchives() {
         ID: id,
         Status: status,
         Command: "UPDATE",
+        supabase_row_count: row.row_count,
+        shopify_variant_count: variantCount,
       });
     }
   }
