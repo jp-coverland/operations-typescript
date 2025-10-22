@@ -1,5 +1,5 @@
 import { google } from "googleapis";
-import { supabaseCoverlandSizeChart } from "../constants/constants";
+import { supabaseCoverlandSizeChart, supabaseCoverlandDbStagingSizeChart } from "../constants/constants";
 import { DateTime } from "luxon";
 import { logger } from "../constants/logger";
 import { authorize } from "../google-sheets/authClient";
@@ -111,6 +111,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
     "third_seat_type",
     "website_true",
     "can_delete",
+    "manual_exclude",
   ];
 
   const matrixifyPayload = [
@@ -180,6 +181,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
         third_seat_type,
         website_true,
         can_delete,
+        manual_exclude,
       }) => [
         id,
         product_vehicle_id,
@@ -246,6 +248,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
         third_seat_type,
         website_true,
         can_delete,
+        manual_exclude,
       ]
     ),
   ];
@@ -263,7 +266,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
     });
     await sheets.spreadsheets.values.clear({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!A2:BM`,
+      range: `${sheetName}!A2:BN`,
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
