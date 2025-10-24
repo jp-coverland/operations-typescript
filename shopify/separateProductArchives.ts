@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import Papa from "papaparse";
-import { shopifyStagingClient } from "./client";
+import { shopifyStagingClient, shopifyProductionClient } from "./client";
 import { HANDLE_QUERY } from "./graphQL";
 
 async function getHandlesFromCSV() {
@@ -17,7 +17,7 @@ async function getHandlesFromCSV() {
 }
 
 async function getProductDataByHandle(handle: string) {
-  const { data, errors } = await shopifyStagingClient.request(HANDLE_QUERY, {
+  const { data, errors } = await shopifyProductionClient.request(HANDLE_QUERY, {
     variables: {
       handle: handle,
     },
