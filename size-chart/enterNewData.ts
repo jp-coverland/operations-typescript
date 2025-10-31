@@ -81,7 +81,7 @@ async function upsertNewEntries() {
       }
     }
 
-    const { error: vehicleError } = await supabaseCoverlandSizeChart.from("product_vehicle").upsert(productVehicles, { onConflict: "id" });
+    const { error: vehicleError } = await supabaseCoverlandDbStagingSizeChart.from("product_vehicle").upsert(productVehicles, { onConflict: "id" });
 
     if (vehicleError) {
       console.error(`${sheet} product vehicle upsert error:`, vehicleError);
@@ -90,7 +90,7 @@ async function upsertNewEntries() {
     }
 
     if (sheet === "car_cover") {
-      const { error: sizeChartError } = await supabaseCoverlandSizeChart
+      const { error: sizeChartError } = await supabaseCoverlandDbStagingSizeChart
         .from("car_cover_size_chart")
         .upsert(carCoverSizeChart, { onConflict: "product_vehicle_id" });
 
@@ -102,7 +102,7 @@ async function upsertNewEntries() {
     }
 
     if (sheet === "seat_cover") {
-      const { error: sizeChartError } = await supabaseCoverlandSizeChart
+      const { error: sizeChartError } = await supabaseCoverlandDbStagingSizeChart
         .from("seat_cover_size_chart")
         .upsert(seatCoverSizeChart, { onConflict: "product_vehicle_id" });
 
@@ -114,7 +114,7 @@ async function upsertNewEntries() {
     }
 
     if (sheet === "floor_mats") {
-      const { error: sizeChartError } = await supabaseCoverlandSizeChart
+      const { error: sizeChartError } = await supabaseCoverlandDbStagingSizeChart
         .from("floor_mats_size_chart")
         .upsert(floorMatSizeChart, { onConflict: "product_vehicle_id" });
 
