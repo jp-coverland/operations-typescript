@@ -1,11 +1,11 @@
 import { google } from "googleapis";
-import { supabaseCoverlandSizeChart } from "../constants/constants";
+import { supabaseCoverlandDbStagingSizeChart } from "../constants/constants";
 import { DateTime } from "luxon";
 import { logger } from "../constants/logger";
 import { authorize } from "../google-sheets/authClient";
 
 async function getMatrixifyCarCovers(start: number, end: number) {
-  const { data, error } = await supabaseCoverlandSizeChart.rpc("get_shopify_matrixify_car_covers").range(start, end);
+  const { data, error } = await supabaseCoverlandDbStagingSizeChart.rpc("get_shopify_matrixify_car_covers").range(start, end);
 
   if (error) {
     throw new Error(`Supabase query failed: ${JSON.stringify(error, null, 2)}`);
