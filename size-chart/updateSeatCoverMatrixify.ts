@@ -112,6 +112,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
     "website_true",
     "can_delete",
     "manual_exclude",
+    "discontinued",
   ];
 
   const matrixifyPayload = [
@@ -182,6 +183,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
         website_true,
         can_delete,
         manual_exclude,
+        discontinued,
       }) => [
         id,
         product_vehicle_id,
@@ -249,6 +251,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
         website_true,
         can_delete,
         manual_exclude,
+        discontinued,
       ]
     ),
   ];
@@ -266,7 +269,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
     });
     await sheets.spreadsheets.values.clear({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!A2:BN`,
+      range: `${sheetName}!A2:BO`,
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,

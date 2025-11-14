@@ -104,6 +104,7 @@ async function updateCarCoverMatrixifyChart(auth: any) {
       product_video_carousel,
       product_video_carousel_thumbnail,
       website_true,
+      discontinued,
     }) => [
       id,
       product_vehicle_id,
@@ -165,6 +166,7 @@ async function updateCarCoverMatrixifyChart(auth: any) {
       product_video_carousel,
       product_video_carousel_thumbnail,
       website_true,
+      discontinued,
     ]
   );
   try {
