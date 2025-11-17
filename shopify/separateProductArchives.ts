@@ -17,7 +17,7 @@ async function getHandlesFromCSV() {
 }
 
 async function getProductDataByHandle(handle: string) {
-  const { data, errors } = await shopifyProductionClient.request(HANDLE_QUERY, {
+  const { data, errors } = await shopifyStagingClient.request(HANDLE_QUERY, {
     variables: {
       handle: handle,
     },
@@ -44,6 +44,7 @@ async function separateProductArchives() {
         Command: "NOT FOUND",
         supabase_row_count: "n/a",
         shopify_variant_count: "n/a",
+        greater_than: "n/a",
       });
     } else {
       const gid = productData.productByHandle.id;
@@ -52,6 +53,7 @@ async function separateProductArchives() {
       const variantCount = productData.productByHandle.variants.edges.length;
 
       const status = variantCount === Number(row.row_count) ? "ARCHIVED" : "MANUAL";
+      const greaterThan = Number(row.row_count) > variantCount;
       console.info(`row_count from supabase: ${row.row_count}, variantCount from Shopify: ${variantCount}, status: ${status}`);
 
       output.push({
@@ -61,6 +63,7 @@ async function separateProductArchives() {
         Command: "UPDATE",
         supabase_row_count: row.row_count,
         shopify_variant_count: variantCount,
+        greater_than: greaterThan ? true : null,
       });
     }
   }
