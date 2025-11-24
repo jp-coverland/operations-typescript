@@ -3,9 +3,11 @@ import fs from "fs";
 import path from "path";
 import Papa from "papaparse";
 
-type CabRpcData = {
+type RpcData = {
   label: string;
   name: string;
+  make: string;
+  model: string;
   product_type: string;
   image_url: string;
 };
@@ -25,10 +27,10 @@ const MATRIXIFY_DEFAULTS = {
   "Definition:Handle": "submodel_variations",
 } as const;
 
-const RPC_FIELDS: Array<keyof CabRpcData> = ["label", "name", "product_type", "image_url"];
+const RPC_FIELDS: Array<keyof RpcData> = ["label", "name", "make", "model", "product_type", "image_url"];
 
-function buildHandle(item: CabRpcData) {
-  const handle = [item.label, item.name, item.product_type]
+function buildHandle(item: RpcData) {
+  const handle = [item.label, item.name, item.make, item.model, item.product_type]
     .filter((part) => part != null)
     .join(" ")
     .toLowerCase()
@@ -48,8 +50,8 @@ async function getFloorMatsVariations() {
   return { data: data, error: null };
 }
 
-function prepareMetaobjectMatrixify(rows: CabRpcData[]): MatrixifyColumns[] {
-  return rows.flatMap((rows: CabRpcData) => {
+function prepareMetaobjectMatrixify(rows: RpcData[]): MatrixifyColumns[] {
+  return rows.flatMap((rows: RpcData) => {
     const handle = buildHandle(rows);
     return RPC_FIELDS.map((field) => ({
       Handle: handle,
