@@ -1,4 +1,4 @@
-import { supabaseCoverlandSizeChart } from "../constants/constants";
+import { supabaseCoverlandDbStagingSizeChart } from "../constants/constants";
 import fs from "fs";
 import path from "path";
 import Papa from "papaparse";
@@ -37,7 +37,7 @@ function buildHandle(item: RpcData) {
 }
 
 async function getSubmodelSeatTypeUrlMapping() {
-  const { data, error } = await supabaseCoverlandSizeChart.rpc("map_submodel_seat_type_image_url");
+  const { data, error } = await supabaseCoverlandDbStagingSizeChart.rpc("map_submodel_seat_type_image_url");
 
   if (error) {
     throw new Error(`Supabase query failed: ${JSON.stringify(error, null, 2)}`);
