@@ -1,19 +1,27 @@
 import fs from "fs";
 import path from "path";
 import Papa from "papaparse";
+import { supabaseCoverlandDbStagingSizeChart } from "../constants/constants";
+
+async function getCompositeSkus() {
+  const { data, error } = await supabaseCoverlandDbStagingSizeChart.rpc("get_component_skus_missing_price_weight");
+
+  if (error) {
+    throw new Error(`Supabase query failed: ${JSON.stringify(error, null, 2)}`);
+  }
+
+  return { data: data, error: null };
+}
 
 async function getIndividualSkus() {
-  const csvFile = fs.readFileSync(path.resolve(__dirname, "composite_skus.csv"), "utf-8");
-  const result = Papa.parse<any>(csvFile, {
-    header: true,
-  });
+  const result = await getCompositeSkus();
 
-  const output = result.data.map((row) => {
-    const matches = row.composite_sku.match(/F-([A-Z0-9]+)-(F|B|R)-([A-Z0-9]+)/);
+  const output = result.data.map((row: any) => {
+    const matches = row.master_sku.match(/F-([A-Z0-9]+)-(F|B|R)-([A-Z0-9]+)/);
     if (!matches) return { ...row, component_1: null, component_2: null };
 
     const [_, frontSize, frontOrBack, rearSize] = matches;
-    const parts = row.composite_sku.split("-");
+    const parts = row.master_sku.split("-");
 
     const prefix = parts.slice(0, 3).join("-"); // e.g. CA-SC-10
     const color = parts.slice(7).join("-"); // e.g. BK-1TO
@@ -23,6 +31,7 @@ async function getIndividualSkus() {
 
     return {
       ...row,
+      product_type: "seat covers",
       component_1,
       component_2,
     };
