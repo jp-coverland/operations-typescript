@@ -140,7 +140,7 @@ async function updateFloorMatsSizeChart(auth: any) {
     });
     await sheets.spreadsheets.values.clear({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!A1:AA`,
+      range: `${sheetName}!A1:AE`,
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
