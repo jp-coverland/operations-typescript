@@ -121,7 +121,7 @@ async function updateFloorMatsSizeChart(auth: any) {
         third_row_size,
         third_row_mold_status,
         front_price,
-        rear_size,
+        rear_price,
         third_row_price,
         full_set_price,
       ]
