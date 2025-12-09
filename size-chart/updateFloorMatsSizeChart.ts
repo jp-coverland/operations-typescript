@@ -51,6 +51,7 @@ async function updateFloorMatsSizeChart(auth: any) {
     "rear_mold_status",
     "third_row_size",
     "third_row_mold_status",
+    "front_price",
   ];
 
   const payload = [
