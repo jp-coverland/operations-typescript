@@ -51,6 +51,10 @@ async function updateFloorMatsSizeChart(auth: any) {
     "rear_mold_status",
     "third_row_size",
     "third_row_mold_status",
+    "front_price",
+    "rear_price",
+    "third_row_price",
+    "full_set_price",
   ];
 
   const payload = [
@@ -84,6 +88,10 @@ async function updateFloorMatsSizeChart(auth: any) {
         rear_mold_status,
         third_row_size,
         third_row_mold_status,
+        front_price,
+        rear_price,
+        third_row_price,
+        full_set_price,
       }) => [
         id,
         f_number,
@@ -112,6 +120,10 @@ async function updateFloorMatsSizeChart(auth: any) {
         rear_mold_status,
         third_row_size,
         third_row_mold_status,
+        front_price,
+        rear_price,
+        third_row_price,
+        full_set_price,
       ]
     ),
   ];
@@ -120,7 +132,7 @@ async function updateFloorMatsSizeChart(auth: any) {
 
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!AB1`,
+      range: `${sheetName}!AF1`,
       valueInputOption: "RAW",
       requestBody: {
         values: [[`Last updated: ${timestamp}`]],
@@ -128,7 +140,7 @@ async function updateFloorMatsSizeChart(auth: any) {
     });
     await sheets.spreadsheets.values.clear({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!A1:AA`,
+      range: `${sheetName}!A1:AE`,
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
