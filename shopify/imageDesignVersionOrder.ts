@@ -7,6 +7,7 @@ type RpcData = {
   seat_type: string;
   image_design_version: string;
   image_order: string;
+  keyword: string;
 };
 
 type MatrixifyColumns = {
@@ -24,7 +25,7 @@ const MATRIXIFY_DEFAULTS = {
   "Definition:Handle": "image_design_version_order",
 } as const;
 
-const RPC_FIELDS: Array<keyof RpcData> = ["seat_type", "image_design_version", "image_order"];
+const RPC_FIELDS: Array<keyof RpcData> = ["seat_type", "image_design_version", "image_order", "keyword"];
 
 function buildHandle(item: RpcData) {
   const handle = [item.seat_type]
