@@ -46,6 +46,9 @@ async function updateSeatCoverSizeChart(auth: any) {
     "third_seat_size",
     "google_drive_image_url",
     "direct_link",
+    "first_row",
+    "second_row",
+    "third_row",
   ];
 
   const payload = [
@@ -74,6 +77,9 @@ async function updateSeatCoverSizeChart(auth: any) {
         third_seat_size,
         google_drive_image_url,
         direct_link,
+        first_row,
+        second_row,
+        third_row,
       }) => [
         vehicle_type,
         id,
@@ -97,6 +103,9 @@ async function updateSeatCoverSizeChart(auth: any) {
         third_seat_size,
         google_drive_image_url,
         direct_link,
+        first_row,
+        second_row,
+        third_row,
       ]
     ),
   ];
