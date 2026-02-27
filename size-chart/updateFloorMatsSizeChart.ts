@@ -55,6 +55,8 @@ async function updateFloorMatsSizeChart(auth: any) {
     "rear_price",
     "third_row_price",
     "full_set_price",
+    "master_set_sku",
+    "complete_con"
   ];
 
   const payload = [
@@ -92,6 +94,8 @@ async function updateFloorMatsSizeChart(auth: any) {
         rear_price,
         third_row_price,
         full_set_price,
+        master_set_sku,
+        complete_con
       }) => [
         id,
         f_number,
@@ -124,6 +128,8 @@ async function updateFloorMatsSizeChart(auth: any) {
         rear_price,
         third_row_price,
         full_set_price,
+        master_set_sku,
+        complete_con
       ]
     ),
   ];
