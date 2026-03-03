@@ -37,12 +37,12 @@ async function updateCarCoverSizeChart(auth: any) {
     "submodel_4",
     "concatenated",
     "notes",
-    "size",
-    "custom_size",
+    "03_size",
+    "15_size",
     "vehicle_length",
   ];
 
-  const header2 = ["grouped_id", "grouped_f_number", "grouped_info", "grouped_size", "grouped_custom_size", "grouped_notes", "keyword"];
+  const header2 = ["grouped_id", "grouped_f_number", "grouped_info", "03_grouped_size", "15_grouped_custom_size", "grouped_notes", "keyword"];
 
   const groupedPayload1 = [
     header1,
@@ -60,8 +60,8 @@ async function updateCarCoverSizeChart(auth: any) {
         submodel_4,
         concatenated,
         notes,
-        size,
-        custom_size,
+        size_03,
+        size_15,
         vehicle_length,
       }) => [
         vehicle_type,
@@ -76,8 +76,8 @@ async function updateCarCoverSizeChart(auth: any) {
         submodel_4,
         concatenated,
         notes,
-        size,
-        custom_size,
+        size_03,
+        size_15,
         vehicle_length,
       ]
     ),
@@ -85,7 +85,7 @@ async function updateCarCoverSizeChart(auth: any) {
 
   const groupedPayload2 = [
     header2,
-    ...(groupedData.data as any[]).map(({ grouped_id, grouped_f_number, grouped_info, grouped_size, grouped_custom_size, grouped_notes, keyword }) => {
+    ...(groupedData.data as any[]).map(({ grouped_id, grouped_f_number, grouped_info, grouped_size_03, grouped_custom_size_15, grouped_notes, keyword }) => {
       const isFirstInGroup = grouped_f_number !== lastGroupedFNumber;
       lastGroupedFNumber = grouped_f_number;
 
@@ -94,8 +94,8 @@ async function updateCarCoverSizeChart(auth: any) {
         isFirstInGroup ? grouped_id : "",
         isFirstInGroup ? grouped_f_number : "",
         isFirstInGroup ? grouped_info : "",
-        isFirstInGroup ? grouped_size : "",
-        isFirstInGroup ? grouped_custom_size : "",
+        isFirstInGroup ? grouped_size_03 : "",
+        isFirstInGroup ? grouped_custom_size_15 : "",
         isFirstInGroup ? grouped_notes : "",
         isFirstInGroup ? keyword : "",
       ];
