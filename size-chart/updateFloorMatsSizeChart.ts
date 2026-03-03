@@ -136,17 +136,17 @@ async function updateFloorMatsSizeChart(auth: any) {
   try {
     logger.info("Uploading size info to google sheets...");
 
+    await sheets.spreadsheets.values.clear({
+      spreadsheetId: SHEETS_ID,
+      range: `${sheetName}!A1:AH`,
+    });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!AF1`,
+      range: `${sheetName}!AH1`,
       valueInputOption: "RAW",
       requestBody: {
         values: [[`Last updated: ${timestamp}`]],
       },
-    });
-    await sheets.spreadsheets.values.clear({
-      spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!A1:AE`,
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
