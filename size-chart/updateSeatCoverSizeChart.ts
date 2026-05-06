@@ -63,7 +63,19 @@ async function updateSeatCoverSizeChart(auth: any) {
     "rear_db", 
     "rear_br", 
     "rear_wr", 
-    "third_bk",
+    "third_bk", 
+    "third_be", 
+    "third_gr", 
+    "third_dg", 
+    "third_db", 
+    "third_br", 
+    "third_wr", 
+    "custom_front_size",
+    "custom_rear_size",
+    "custom_third_size",
+    "alternative_front_size",
+    "alternative_rear_size",
+    "alternative_third_size"
   ];
 
   const payload = [
@@ -109,7 +121,13 @@ async function updateSeatCoverSizeChart(auth: any) {
         rear_db, 
         rear_br, 
         rear_wr,
-        third_bk ,third_be ,third_gr ,third_dg ,third_db ,third_br ,third_wr       
+        third_bk ,third_be ,third_gr ,third_dg ,third_db ,third_br ,third_wr ,
+        custom_front_size,
+        custom_rear_size,
+        custom_third_size, 
+        alternative_front_size,
+        alternative_rear_size,
+        alternative_third_size     
       }) => [
         vehicle_type,
         id,
@@ -151,6 +169,12 @@ async function updateSeatCoverSizeChart(auth: any) {
         rear_br, 
         rear_wr,
         third_bk ,third_be ,third_gr ,third_dg ,third_db ,third_br ,third_wr ,
+        custom_front_size,
+        custom_rear_size,
+        custom_third_size, 
+        alternative_front_size,
+        alternative_rear_size,
+        alternative_third_size  
       ]
     ),
   ];
