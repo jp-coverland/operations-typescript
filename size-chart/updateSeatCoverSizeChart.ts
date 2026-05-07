@@ -192,7 +192,7 @@ async function updateSeatCoverSizeChart(auth: any) {
     });
     await sheets.spreadsheets.values.clear({
       spreadsheetId: SHEETS_ID,
-      range: `${sheetName}!A2:V`,
+      range: `${sheetName}!A2:AZ`,
     });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEETS_ID,
