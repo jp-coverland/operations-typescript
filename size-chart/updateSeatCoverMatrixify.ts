@@ -113,6 +113,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
     "can_delete",
     "manual_exclude",
     "discontinued",
+    "seat_set",
   ];
 
   const matrixifyPayload = [
@@ -184,6 +185,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
         can_delete,
         manual_exclude,
         discontinued,
+        seat_set,
       }) => [
         id,
         product_vehicle_id,
@@ -252,6 +254,7 @@ async function updateSeatCoverMatrixifyChart(auth: any) {
         can_delete,
         manual_exclude,
         discontinued,
+        seat_set,
       ]
     ),
   ];
